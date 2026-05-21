@@ -1,0 +1,2212 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="description" content="P4P - Fan-driven Pound-for-Pound MMA rankings. Vote for your favorite fighter using Pi Network.">
+<title>P4P v5 — Fan MMA Rankings</title>
+
+<!-- Pi Network SDK (sandbox mode for Developer Portal checklist step 10) -->
+<script src="https://sdk.minepi.com/pi-sdk.js"></script>
+
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght=0,400;0,600;0,700;0,800;0,900;1,700&family=Barlow:wght@400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+<style>
+/* =============================================
+   CSS CUSTOM PROPERTIES — THEME SYSTEM
+   ============================================= */
+:root {
+  --gold:       #F5C518;
+  --gold-dim:   #C49A14;
+  --gold-glow:  rgba(245,197,24,0.18);
+  --pi:         #6922D4;
+  --pi-mid:     #8B3FF5;
+  --pi-light:   #B07EFF;
+  --pi-glow:    rgba(139,63,245,0.18);
+  --red:        #E8344A;
+  --green:      #00C896;
+  --radius-sm:  6px;
+  --radius-md:  10px;
+  --radius-lg:  16px;
+  --speed:      0.22s;
+}
+
+/* DARK THEME */
+[data-theme="dark"] {
+  --bg-root:    #08080F;
+  --bg-surface: #0F0F1A;
+  --bg-card:    #141420;
+  --bg-card2:   #1A1A28;
+  --bg-input:   #1F1F30;
+  --border:     rgba(255,255,255,0.07);
+  --border-acc: rgba(245,197,24,0.2);
+  --border-pi:  rgba(139,63,245,0.25);
+  --text-h:     #FFFFFF;
+  --text-body:  #C8C8D8;
+  --text-muted: #60607A;
+  --text-dim:   #404058;
+  --shadow-card: 0 4px 28px rgba(0,0,0,0.55);
+  --shadow-glow: 0 0 40px rgba(245,197,24,0.08);
+  --nav-blur:   rgba(8,8,15,0.95);
+  --overlay:    rgba(0,0,10,0.88);
+  --photo-bg:   #1C1C2E;
+  --photo-border: rgba(255,255,255,0.08);
+  --champ-grad: linear-gradient(135deg, rgba(245,197,24,0.07) 0%, rgba(139,63,245,0.05) 100%);
+  --row-hover:  rgba(139,63,245,0.07);
+  --scan-line:  rgba(255,255,255,0.015);
+}
+
+/* LIGHT THEME */
+[data-theme="light"] {
+  --bg-root:    #F0EFF8;
+  --bg-surface: #E8E7F2;
+  --bg-card:    #FFFFFF;
+  --bg-card2:   #F6F5FC;
+  --bg-input:   #EEEDF8;
+  --border:     rgba(0,0,0,0.08);
+  --border-acc: rgba(180,130,0,0.25);
+  --border-pi:  rgba(105,34,212,0.2);
+  --text-h:     #0E0E1E;
+  --text-body:  #3A3A55;
+  --text-muted: #8888A8;
+  --text-dim:   #BABACE;
+  --shadow-card: 0 2px 20px rgba(105,34,212,0.1);
+  --shadow-glow: 0 0 40px rgba(105,34,212,0.05);
+  --nav-blur:   rgba(240,239,248,0.96);
+  --overlay:    rgba(10,8,30,0.72);
+  --photo-bg:   #E0DFF0;
+  --photo-border: rgba(0,0,0,0.1);
+  --champ-grad: linear-gradient(135deg, rgba(245,197,24,0.08) 0%, rgba(105,34,212,0.06) 100%);
+  --row-hover:  rgba(105,34,212,0.05);
+  --scan-line:  transparent;
+}
+
+/* =============================================
+   RESET & BASE
+   ============================================= */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; font-size: 16px; }
+
+body {
+  background: var(--bg-root);
+  color: var(--text-body);
+  font-family: 'Barlow', sans-serif;
+  font-weight: 500;
+  line-height: 1.5;
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: background var(--speed), color var(--speed);
+  padding-bottom: 90px;
+}
+
+/* Scanline texture on dark mode */
+[data-theme="dark"] body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    var(--scan-line) 0px,
+    var(--scan-line) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  pointer-events: none;
+  z-index: 1000;
+  opacity: 0.4;
+}
+
+/* Ambient glow bg */
+.bg-ambient {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 70% 50% at 15% 0%, var(--pi-glow) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 85% 100%, var(--gold-glow) 0%, transparent 60%);
+  transition: opacity var(--speed);
+}
+
+/* =============================================
+   TYPOGRAPHY
+   ============================================= */
+h1, h2, h3, .display {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900;
+  color: var(--text-h);
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+
+/* =============================================
+   HEADER
+   ============================================= */
+.app-header {
+  position: relative;
+  z-index: 10;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-surface);
+  transition: background var(--speed);
+}
+
+.header-inner {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 20px 0 16px;
+}
+
+.header-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.logo-block {}
+.logo-pi-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(139,63,245,0.12);
+  border: 1px solid var(--border-pi);
+  border-radius: 100px;
+  padding: 3px 12px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  color: var(--pi-light);
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+.pi-pulse {
+  width: 6px; height: 6px;
+  background: var(--pi-light);
+  border-radius: 50%;
+  animation: pulse-dot 2.2s infinite;
+}
+@keyframes pulse-dot {
+  0%,100% { opacity:1; transform:scale(1); }
+  50%      { opacity:0.3; transform:scale(0.6); }
+}
+
+.logo-title {
+  font-size: clamp(56px, 14vw, 100px);
+  background: linear-gradient(135deg, var(--gold) 0%, #FFF8E0 50%, var(--gold) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 0.06em;
+  line-height: 0.9;
+}
+[data-theme="light"] .logo-title {
+  background: linear-gradient(135deg, #8A5C00 0%, #3B1F80 50%, #8A5C00 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+.logo-sub {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: clamp(11px, 2.5vw, 15px);
+  letter-spacing: 5px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+/* Header controls */
+.header-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  padding-top: 4px;
+  flex-shrink: 0;
+}
+
+.controls-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mma-live-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.45);
+  color: #ef4444;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 8px 16px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--speed) ease;
+  letter-spacing: 1.5px;
+}
+.mma-live-btn:hover {
+  background: rgba(239, 68, 68, 0.25);
+  border-color: #ef4444;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.35);
+  transform: translateY(-1.5px);
+}
+.mma-live-btn:active {
+  transform: translateY(0);
+}
+.mma-live-pulse {
+  width: 8px;
+  height: 8px;
+  background-color: #ef4444;
+  border-radius: 50%;
+  animation: live-pulse-dot 1.5s infinite;
+}
+@keyframes live-pulse-dot {
+  0% { transform: scale(0.9); opacity: 0.6; }
+  50% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 6px #ef4444; }
+  100% { transform: scale(0.9); opacity: 0.6; }
+}
+
+[data-theme="light"] .mma-live-btn {
+  background: rgba(220, 38, 38, 0.08);
+  border-color: rgba(220, 38, 38, 0.45);
+  color: #dc2626;
+}
+[data-theme="light"] .mma-live-pulse {
+  background-color: #dc2626;
+}
+
+.lang-select {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  color: var(--text-body);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  font-family: 'Barlow', sans-serif;
+  font-size: 13px;
+  cursor: pointer;
+  outline: none;
+  transition: border-color var(--speed), background var(--speed);
+  max-width: 110px;
+}
+.lang-select:focus { border-color: var(--border-pi); }
+
+.theme-btn {
+  width: 44px; height: 24px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  position: relative;
+  transition: background var(--speed);
+  flex-shrink: 0;
+}
+.theme-btn::after {
+  content: '';
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: var(--pi-light);
+  transition: transform var(--speed), background var(--speed);
+  display: flex; align-items: center; justify-content: center;
+}
+[data-theme="light"] .theme-btn::after {
+  transform: translateX(20px);
+  background: var(--gold-dim);
+}
+.theme-icon { font-size: 14px; }
+
+/* Header stats */
+.header-stats {
+  display: flex;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+.hstat { text-align: center; }
+.hstat-n {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 800;
+  font-size: 26px;
+  color: var(--gold);
+  letter-spacing: 1px;
+}
+.hstat-l {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--text-muted);
+}
+
+/* =============================================
+   NAVIGATION
+   ============================================= */
+.app-nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--nav-blur);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.app-nav::-webkit-scrollbar { display: none; }
+
+.nav-inner {
+  display: inline-flex;
+  min-width: 100%;
+  padding: 0 12px;
+}
+
+.nav-tab {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 13px 16px;
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: color var(--speed), border-color var(--speed);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.nav-tab:hover:not(.active) { color: var(--text-body); }
+.nav-tab.active {
+  color: var(--gold);
+  border-bottom-color: var(--gold);
+}
+
+/* =============================================
+   PAGES
+   ============================================= */
+.page { display: none; }
+.page.active { display: block; }
+
+.page-inner {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 20px 14px 80px;
+  position: relative;
+  z-index: 5;
+}
+
+/* Section label */
+.sec-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 18px 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.sec-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* =============================================
+   P4P LEADERBOARD CARDS
+   ============================================= */
+.p4p-list {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.p4p-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  transition: transform var(--speed), border-color var(--speed), box-shadow var(--speed);
+  position: relative;
+  overflow: hidden;
+  cursor: default;
+}
+.p4p-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  background: transparent;
+  transition: background var(--speed);
+}
+.p4p-card:hover {
+  transform: translateX(4px);
+  border-color: var(--border-acc);
+  box-shadow: var(--shadow-card), var(--shadow-glow);
+}
+.p4p-card:hover::before { background: var(--gold); }
+
+/* Top 3 styling */
+.p4p-card[data-rank="1"] { border-color: rgba(245,197,24,0.3); background: linear-gradient(90deg, rgba(245,197,24,0.04), var(--bg-card)); }
+.p4p-card[data-rank="1"]::before { background: var(--gold); }
+.p4p-card[data-rank="2"] { border-color: rgba(192,192,192,0.2); }
+.p4p-card[data-rank="3"] { border-color: rgba(205,127,50,0.18); }
+
+/* Photo slots fallback */
+.ph {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid var(--photo-border);
+}
+
+/* Rank number */
+.rank-num {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900;
+  font-size: 28px;
+  min-width: 34px;
+  text-align: center;
+  color: var(--text-dim);
+  flex-shrink: 0;
+  line-height: 1;
+}
+.rank-num.gold  { color: var(--gold); }
+.rank-num.silver{ color: #C0C0C0; }
+.rank-num.bronze{ color: #CD7F32; }
+
+/* Fighter info */
+.fighter-info { flex: 1; min-width: 0; }
+.fighter-name {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 800;
+  font-size: 17px;
+  color: var(--text-h);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+.fighter-meta {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 2px;
+  line-height: 1.3;
+}
+.flag { font-size: 16px; margin-right: 4px; }
+
+/* Score bar */
+.score-wrap { width: 100px; flex-shrink: 0; }
+.score-pts {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  color: var(--gold);
+  text-align: right;
+  margin-bottom: 4px;
+}
+.score-bar-bg {
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.score-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--pi-mid), var(--gold));
+  border-radius: 2px;
+  transition: width 0.9s cubic-bezier(0.4,0,0.2,1);
+  min-width: 4px;
+}
+
+/* Vote button */
+.btn-vote {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 1.5px;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, var(--pi) 0%, #4A15A0 100%);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: #fff;
+  cursor: pointer;
+  flex-shrink: 0;
+  white-space: nowrap;
+  transition: transform 0.13s, box-shadow 0.13s, background 0.18s;
+  box-shadow: 0 2px 12px rgba(105,34,212,0.35);
+}
+.btn-vote:hover {
+  background: linear-gradient(135deg, var(--pi-mid), var(--pi));
+  transform: scale(1.05) translateY(-1px);
+  box-shadow: 0 5px 20px rgba(139,63,245,0.5);
+}
+.btn-vote:active { transform: scale(0.97); }
+
+/* =============================================
+   WEIGHT CLASS PAGE
+   ============================================= */
+.weight-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 14px;
+}
+.weight-icon {
+  font-size: 34px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.weight-title {
+  font-size: clamp(22px, 6vw, 34px);
+  color: var(--gold);
+  line-height: 1;
+}
+.weight-limit {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 3px;
+  font-family: 'Share Tech Mono', monospace;
+}
+
+/* Champion card */
+.champ-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: var(--champ-grad);
+  border: 1px solid var(--border-acc);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  box-shadow: var(--shadow-card);
+}
+.champ-label-tag {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 3px;
+}
+.champ-name {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900;
+  font-size: clamp(18px, 5vw, 26px);
+  color: var(--text-h);
+  line-height: 1;
+}
+.champ-record {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 3px;
+}
+
+/* Fighter rows */
+.fighter-list { display: flex; flex-direction: column; gap: 5px; }
+.fighter-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 13px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  transition: transform var(--speed), border-color var(--speed), background var(--speed);
+  position: relative;
+  overflow: hidden;
+}
+.fighter-row::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: transparent;
+  transition: background var(--speed);
+}
+.fighter-row:hover {
+  transform: translateX(3px);
+  border-color: var(--border-pi);
+  background: var(--row-hover);
+}
+.fighter-row:hover::before { background: var(--pi-mid); }
+
+.fr-rank {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900;
+  font-size: 20px;
+  min-width: 26px;
+  text-align: center;
+  color: var(--text-dim);
+  flex-shrink: 0;
+}
+.fr-info { flex: 1; min-width: 0; }
+.fr-name {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--text-h);
+  line-height: 1.2;
+}
+.fr-record {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+
+/* Tag for interim/note */
+.tag-note {
+  display: inline-block;
+  font-size: 10px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--gold);
+  background: rgba(245,197,24,0.1);
+  border: 1px solid rgba(245,197,24,0.25);
+  border-radius: 3px;
+  padding: 1px 5px;
+  margin-left: 5px;
+  vertical-align: middle;
+}
+
+/* =============================================
+   MODAL
+   ============================================= */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: var(--overlay);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--speed);
+}
+.modal-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+.modal-box {
+  background: var(--bg-card2);
+  border: 1px solid var(--border-acc);
+  border-radius: var(--radius-lg);
+  padding: 28px 24px;
+  max-width: 400px;
+  width: 100%;
+  position: relative;
+  transform: translateY(28px) scale(0.96);
+  transition: transform 0.26s cubic-bezier(0.34,1.56,0.64,1);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(245,197,24,0.1);
+}
+.modal-overlay.open .modal-box { transform: translateY(0) scale(1); }
+
+.modal-close {
+  position: absolute;
+  top: 14px; right: 16px;
+  background: none; border: none;
+  color: var(--text-muted); font-size: 22px;
+  cursor: pointer; line-height: 1;
+  transition: color var(--speed);
+}
+.modal-close:hover { color: var(--text-h); }
+
+.modal-label {
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--pi-light);
+  margin-bottom: 4px;
+}
+.modal-name {
+  font-size: clamp(20px, 5vw, 27px);
+  color: var(--text-h);
+  line-height: 1;
+}
+.modal-division {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* Pi cost box */
+.pi-cost-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(139,63,245,0.09);
+  border: 1px solid var(--border-pi);
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  margin-bottom: 14px;
+}
+.pi-cost-left .pi-amount {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900;
+  font-size: 42px;
+  color: var(--pi-light);
+  line-height: 1;
+}
+.pi-cost-left .pi-label {
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+.pi-cost-right { text-align: right; }
+.pi-cost-right .pi-pts {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900;
+  font-size: 26px;
+  color: var(--gold);
+  line-height: 1;
+}
+.pi-cost-right .pi-pts-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 2px;
+}
+
+/* Wallet note */
+.wallet-note {
+  background: rgba(255,255,255,0.03);
+  border-radius: var(--radius-sm);
+  padding: 10px 13px;
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 16px;
+  border: 1px solid var(--border);
+}
+[data-theme="light"] .wallet-note { background: rgba(0,0,0,0.03); }
+.wallet-addr {
+  font-family: 'Share Tech Mono', monospace;
+  color: var(--pi-light);
+  font-size: 11px;
+  word-break: break-all;
+  margin-top: 3px;
+}
+
+/* Confirm button */
+.btn-confirm {
+  width: 100%;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 800;
+  font-size: 19px;
+  letter-spacing: 2px;
+  padding: 14px;
+  background: linear-gradient(135deg, var(--pi) 0%, #3A0D8F 100%);
+  border: none;
+  border-radius: var(--radius-md);
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.15s;
+  box-shadow: 0 4px 20px rgba(105,34,212,0.4);
+}
+.btn-confirm:hover {
+  background: linear-gradient(135deg, var(--pi-mid), var(--pi));
+  box-shadow: 0 8px 32px rgba(139,63,245,0.55);
+  transform: translateY(-1px);
+}
+.btn-confirm:active { transform: translateY(0); }
+.btn-confirm:disabled {
+  opacity: 0.6; cursor: not-allowed; transform: none;
+}
+
+/* Loading spinner inside button */
+.btn-confirm .spinner {
+  display: inline-block;
+  width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* =============================================
+   TOAST
+   ============================================= */
+.toast-container {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 300;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+.toast {
+  background: var(--bg-card2);
+  border: 1px solid var(--border-pi);
+  border-radius: var(--radius-md);
+  padding: 12px 22px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--pi-light);
+  letter-spacing: 0.5px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  white-space: nowrap;
+  animation: toast-in 0.35s cubic-bezier(0.34,1.56,0.64,1) forwards,
+             toast-out 0.3s ease 2.7s forwards;
+}
+.toast.success { color: var(--green); border-color: rgba(0,200,150,0.35); }
+.toast.error   { color: var(--red); border-color: rgba(232,52,74,0.35); }
+
+@keyframes toast-in {
+  from { opacity:0; transform:translateY(20px) scale(0.92); }
+  to   { opacity:1; transform:translateY(0) scale(1); }
+}
+@keyframes toast-out {
+  from { opacity:1; transform:translateY(0); }
+  to   { opacity:0; transform:translateY(10px); pointer-events:none; }
+}
+
+/* =============================================
+   FOOTER / DISCLAIMER
+   ============================================= */
+.app-footer {
+  position: relative;
+  z-index: 5;
+  border-top: 1px solid var(--border);
+  padding: 20px 16px;
+  text-align: center;
+}
+.footer-disclaimer {
+  font-size: 11px;
+  color: var(--text-dim);
+  max-width: 640px;
+  margin: 0 auto;
+  line-height: 1.6;
+  font-style: italic;
+}
+.footer-brand {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-top: 8px;
+}
+
+/* =============================================
+   RTL SUPPORT (Arabic)
+   ============================================= */
+[dir="rtl"] .p4p-card::before,
+[dir="rtl"] .fighter-row::before {
+  left: auto; right: 0;
+}
+[dir="rtl"] .p4p-card:hover,
+[dir="rtl"] .fighter-row:hover {
+  transform: translateX(-4px);
+}
+[dir="rtl"] .score-wrap { text-align: left; }
+[dir="rtl"] .score-pts  { text-align: left; }
+
+/* =============================================
+   RESPONSIVE
+   ============================================= */
+@media (max-width: 580px) {
+  .score-wrap { display: none; }
+  .btn-vote { font-size: 13px; padding: 7px 12px; }
+  .fighter-name { font-size: 15px; }
+  .p4p-card { gap: 9px; padding: 9px 11px; }
+  .fighter-row { gap: 8px; padding: 8px 10px; }
+}
+
+/* =============================================
+   BOTTOM TRANSPARENT FLOATING NAVIGATION BAR
+   ============================================= */
+.bottom-nav-bar {
+  position: fixed;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 16px);
+  max-width: 500px;
+  z-index: 99;
+  background: rgba(15, 15, 26, 0.45);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 6px 8px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 6px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  transition: background var(--speed), border var(--speed);
+}
+[data-theme="light"] .bottom-nav-bar {
+  background: rgba(230, 228, 245, 0.55);
+  box-shadow: 0 10px 30px rgba(105,34,212,0.06);
+}
+.bottom-nav-btn {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  font-family: 'Share Tech Mono', monospace;
+  color: var(--text-h);
+  border-radius: var(--radius-md);
+  padding: 4px 6px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: all var(--speed) ease;
+  min-height: 42px;
+  text-align: center;
+}
+[data-theme="light"] .bottom-nav-btn {
+  background: rgba(0, 0, 0, 0.015);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+.bottom-nav-btn:hover {
+  background: rgba(139, 63, 245, 0.06);
+  border-color: rgba(139, 63, 245, 0.35);
+  color: var(--pi-light);
+  transform: translateY(-2px);
+}
+.bottom-nav-btn:active {
+  transform: translateY(0);
+}
+.bottom-nav-btn.center-btn {
+  border-color: rgba(245, 197, 24, 0.15);
+  background: rgba(245, 197, 24, 0.01);
+}
+.bottom-nav-btn.center-btn:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: rgba(245, 197, 24, 0.08);
+}
+.bottom-nav-btn .btn-emoji {
+  font-size: 13px;
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all var(--speed) ease;
+}
+[data-theme="light"] .bottom-nav-btn .btn-emoji {
+  background: rgba(0, 0, 0, 0.025);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+.bottom-nav-btn:hover .btn-emoji {
+  transform: scale(1.1) rotate(5deg);
+  background: rgba(139, 63, 245, 0.15);
+  border-color: var(--pi-light);
+  box-shadow: 0 0 8px rgba(139, 63, 245, 0.3);
+}
+.bottom-nav-btn.center-btn:hover .btn-emoji {
+  background: rgba(245, 197, 24, 0.15);
+  border-color: var(--gold);
+  box-shadow: 0 0 8px rgba(245, 197, 24, 0.3);
+}
+.bottom-nav-btn .btn-lbl {
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+</style>
+</head>
+<body>
+
+<div class="bg-ambient"></div>
+
+<header class="app-header">
+  <div class="header-inner">
+    <div class="header-top">
+      <div class="logo-block">
+        <div class="logo-pi-badge">
+          <div class="pi-pulse"></div>
+          Pi Network
+        </div>
+        <div class="logo-title">P4P</div>
+        <div class="logo-sub">Pound for Pound · Fan Rankings</div>
+      </div>
+      <div class="header-controls">
+        <div class="controls-row">
+          <select class="lang-select" id="langSel" onchange="setLang(this.value)" aria-label="Language">
+            <option value="en">🇬🇧 EN</option>
+            <option value="ru">🇷🇺 RU</option>
+            <option value="ar">🇸🇦 AR</option>
+            <option value="fr">🇫🇷 FR</option>
+            <option value="de">🇩🇪 DE</option>
+            <option value="it">🇮🇹 IT</option>
+            <option value="fil">🇵🇭 FIL</option>
+            <option value="id">🇮🇩 ID</option>
+            <option value="zh">🇨🇳 ZH</option>
+            <option value="ja">🇯🇵 JA</option>
+            <option value="ko">🇰🇷 KO</option>
+          </select>
+          <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" aria-label="Toggle theme" title="Toggle dark/light mode"></button>
+        </div>
+        <button class="mma-live-btn" onclick="onMmaVideosClick()">
+          <span class="mma-live-pulse"></span>
+          <span>MMA VIDEOS</span>
+        </button>
+      </div>
+    </div>
+    <div class="header-stats">
+      <div class="hstat">
+        <div class="hstat-n" id="statVotes">0</div>
+        <div class="hstat-l" data-i18n="statVotes">Fan Votes</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-n" id="statPi">0.0 π</div>
+        <div class="hstat-l" data-i18n="statPi">Pi Collected</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-n">100</div>
+        <div class="hstat-l" data-i18n="statPts">Points / 1π</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ============================
+     NAVIGATION
+     ============================ -->
+<nav class="app-nav" role="navigation">
+  <div class="nav-inner" id="navTabs">
+    <!-- Tabs injected by JS -->
+  </div>
+</nav>
+
+<!-- ============================
+     PAGES
+     ============================ -->
+<main id="appMain">
+  <!-- P4P Leaderboard -->
+  <div class="page active" id="page-p4p">
+    <div class="page-inner">
+      <div class="sec-label" data-i18n="p4pSec">Men's P4P · Fan Vote Leaderboard</div>
+      <div class="p4p-list" id="p4pList"></div>
+    </div>
+  </div>
+
+  <!-- Weight class pages injected by JS -->
+</main>
+
+<!-- ============================
+     VOTE MODAL
+     ============================ -->
+<div class="modal-overlay" id="voteModal" role="dialog" aria-modal="true">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()" aria-label="Close">✕</button>
+
+    <div class="modal-fighter-hero">
+      <div class="modal-label" data-i18n="voteFor">Vote For</div>
+      <div class="modal-name" id="mName">—</div>
+      <div class="modal-division" id="mDiv">—</div>
+    </div>
+
+    <div class="pi-cost-box">
+      <div class="pi-cost-left">
+        <div class="pi-amount">1 π</div>
+        <div class="pi-label" data-i18n="voteCost">Vote Cost</div>
+      </div>
+      <div class="pi-cost-right">
+        <div class="pi-pts">+100 pts</div>
+        <div class="pi-pts-label" data-i18n="toFighter">To Fighter</div>
+      </div>
+    </div>
+
+    <div class="wallet-note">
+      <span data-i18n="walletNote">1 Pi is sent to the organizer's Pi wallet:</span>
+      <div class="wallet-addr">GCXCW4REFA6PMYKOOI5N7F53P4HJR2SETBIOVTVH3ZAFFG35G47OMTWG</div>
+    </div>
+
+    <button class="btn-confirm" id="confirmBtn" onclick="confirmVote()" data-i18n="confirmVote">
+      CONFIRM VOTE — 1π
+    </button>
+  </div>
+</div>
+
+<!-- ============================
+     TOAST CONTAINER
+     ============================ -->
+<div class="toast-container" id="toastZone"></div>
+
+<!-- ============================
+     BOTTOM TRANSPARENT FLOATING NAVIGATION BAR
+     ============================ -->
+<div class="bottom-nav-bar">
+  <button class="bottom-nav-btn" onclick="onBottomNavClick('settings')">
+    <span class="btn-emoji">⚙️</span>
+    <span class="btn-lbl" data-i18n="settings">Settings</span>
+  </button>
+  <button class="bottom-nav-btn center-btn" onclick="onBottomNavClick('login')">
+    <span class="btn-emoji">👤</span>
+    <span class="btn-lbl" data-i18n="login">Login</span>
+  </button>
+  <button class="bottom-nav-btn" onclick="onBottomNavClick('pioneerrating')">
+    <span class="btn-emoji">🏆</span>
+    <span class="btn-lbl" data-i18n="pioneerrating">Pioneer</span>
+  </button>
+</div>
+
+<!-- ============================
+     FOOTER
+     ============================ -->
+<footer class="app-footer">
+  <p class="footer-disclaimer" data-i18n="disclaimer">
+    This app is a fan project and is not affiliated with, endorsed, or sponsored by any professional sports organization.
+  </p>
+  <p class="footer-brand">P4P Fan Rankings · Pi Network · 2026</p>
+</footer>
+
+<!-- ============================
+     JAVASCRIPT
+     ============================ -->
+<script>
+/* =========================================================
+   TRANSLATIONS — 11 languages
+   ========================================================= */
+const LANG = {
+  en: {
+    subtitle: "Pound for Pound · Fan Rankings",
+    statVotes: "Fan Votes", statPi: "Pi Collected", statPts: "Points / 1π",
+    p4pSec: "Men's P4P · Fan Vote Leaderboard",
+    voteFor: "Vote For", voteCost: "Vote Cost", toFighter: "To Fighter",
+    walletNote: "1 Pi is sent to the organizer's Pi wallet:",
+    confirmVote: "CONFIRM VOTE — 1π",
+    champion: "CHAMPION", tabP4P: "🏆 P4P TOP-15",
+    toastSuccess: "Vote counted for", toastPts: "+100 pts",
+    toastError: "Payment cancelled or failed. Please try again.",
+    pts: "pts", loading: "PROCESSING…",
+    disclaimer: "This app is a fan project and is not affiliated with, endorsed, or sponsored by any professional sports organization.",
+    p4pOfficialRank: "Official rank",
+  },
+  ru: {
+    subtitle: "Фунт за Фунт · Фанатский Рейтинг",
+    statVotes: "Голосов", statPi: "Pi Собрано", statPts: "Очков / 1π",
+    p4pSec: "Мужской P4P · Рейтинг по голосам фанатов",
+    voteFor: "Голосовать за", voteCost: "Стоимость", toFighter: "Бойцу",
+    walletNote: "1 Pi переводится в Pi-кошелёк организатора:",
+    confirmVote: "ПОДТВЕРДИТЬ — 1π",
+    champion: "ЧЕМПИОН", tabP4P: "🏆 P4P ТОП-15",
+    toastSuccess: "Голос засчитан за", toastPts: "+100 очков",
+    toastError: "Платёж отменён или не прошёл. Попробуйте ещё раз.",
+    pts: "очк", loading: "ОБРАБОТКА…",
+    disclaimer: "Это фанатский проект, не связанный и не аффилированный ни с одной профессиональной спортивной организацией.",
+    p4pOfficialRank: "Официальный ранг",
+  },
+  ar: {
+    subtitle: "باوند فور باوند · تصنيف المشجعين",
+    statVotes: "أصوات", statPi: "Pi المُجمَّع", statPts: "نقطة / 1π",
+    p4pSec: "P4P الرجال · قائمة أصوات المشجعين",
+    voteFor: "صوّت لـ", voteCost: "تكلفة التصويت", toFighter: "للمقاتل",
+    walletNote: "يُرسل 1 Pi إلى محفظة المنظّم:",
+    confirmVote: "تأكيد التصويت — 1π",
+    champion: "البطل", tabP4P: "🏆 أفضل 15 P4P",
+    toastSuccess: "تم احتساب صوتك لـ", toastPts: "+100 نقطة",
+    toastError: "تم إلغاء الدفع أو فشله. يرجى المحاولة مرة أخرى.",
+    pts: "نقطة", loading: "جارٍ المعالجة…",
+    disclaimer: "هذا التطبيق مشروع من إعداد المشجعين وليس له أي صلة بأي منظمة رياضية احترافية.",
+    p4pOfficialRank: "الترتيب الرسمي",
+  },
+  fr: {
+    subtitle: "Pound for Pound · Classement des Fans",
+    statVotes: "Votes", statPi: "Pi Collectés", statPts: "Points / 1π",
+    p4pSec: "P4P Hommes · Classement par votes des fans",
+    voteFor: "Voter Pour", voteCost: "Coût du Vote", toFighter: "Au Combattant",
+    walletNote: "1 Pi est envoyé au portefeuille Pi de l'organisateur :",
+    confirmVote: "CONFIRMER — 1π",
+    champion: "CHAMPION", tabP4P: "🏆 P4P TOP-15",
+    toastSuccess: "Vote compté pour", toastPts: "+100 pts",
+    toastError: "Paiement annulé ou échoué. Veuillez réessayer.",
+    pts: "pts", loading: "TRAITEMENT…",
+    disclaimer: "Cette application est un projet de fans et n'est affiliée, approuvée ou sponsorisée par aucune organisation sportive professionnelle.",
+    p4pOfficialRank: "Rang officiel",
+  },
+  de: {
+    subtitle: "Pound for Pound · Fan-Rangliste",
+    statVotes: "Stimmen", statPi: "Pi Gesammelt", statPts: "Punkte / 1π",
+    p4pSec: "Herren P4P · Fan-Stimmen-Rangliste",
+    voteFor: "Abstimmen für", voteCost: "Abstimmungskosten", toFighter: "Für Kämpfer",
+    walletNote: "1 Pi wird an die Pi-Wallet des Organisators gesendet:",
+    confirmVote: "BESTÄTIGEN — 1π",
+    champion: "CHAMPION", tabP4P: "🏆 P4P TOP-15",
+    toastSuccess: "Stimme gezählt für", toastPts: "+100 Pkt",
+    toastError: "Zahlung abgebrochen oder fehlgeschlagen. Bitte erneut versuchen.",
+    pts: "Pkt", loading: "VERARBEITUNG…",
+    disclaimer: "Diese App ist ein Fan-Projekt und ist weder mit einer professionellen Sportorganisation verbunden noch von ihr gefördert oder gesponsert.",
+    p4pOfficialRank: "Offizieller Rang",
+  },
+  it: {
+    subtitle: "Pound for Pound · Classifica Fan",
+    statVotes: "Voti", statPi: "Pi Raccolti", statPts: "Punti / 1π",
+    p4pSec: "P4P Uomini · Classifica voti dei fan",
+    voteFor: "Vota Per", voteCost: "Costo del Voto", toFighter: "Al Combattente",
+    walletNote: "1 Pi viene inviato al portafoglio Pi dell'organizzatore:",
+    confirmVote: "CONFERMA — 1π",
+    champion: "CAMPIONE", tabP4P: "🏆 P4P TOP-15",
+    toastSuccess: "Voto contato per", toastPts: "+100 pts",
+    toastError: "Pagamento annullato o fallito. Riprova.",
+    pts: "pts", loading: "ELABORAZIONE…",
+    disclaimer: "Questa app è un progetto di fan e non è affiliata, approvata o sponsorizzata da alcuna organizzazione sportiva professionistica.",
+    p4pOfficialRank: "Posizione ufficiale",
+  },
+  fil: {
+    subtitle: "Pound for Pound · Fan Rankings",
+    statVotes: "Mga Boto", statPi: "Pi Nakolekta", statPts: "Puntos / 1π",
+    p4pSec: "P4P Lalaki · Fan Vote Leaderboard",
+    voteFor: "Bumoto Para sa", voteCost: "Halaga ng Boto", toFighter: "Para sa Mandirigma",
+    walletNote: "1 Pi ay ipinapadala sa Pi wallet ng organizer:",
+    confirmVote: "KUMPIRMAHIN — 1π",
+    champion: "KAMPEON", tabP4P: "🏆 P4P TOP-15",
+    toastSuccess: "Boto nabilang para sa", toastPts: "+100 pts",
+    toastError: "Kinansela o nabigo ang bayad. Subukan ulit.",
+    pts: "pts", loading: "PINOPROSESO…",
+    disclaimer: "Ang app na ito ay isang fan project and hindi kaakibat, inendorso, o sinponsor ng anumang propesyonal na organisasyong pampalakasan.",
+    p4pOfficialRank: "Opisyal na ranggo",
+  },
+  id: {
+    subtitle: "Pound for Pound · Peringkat Penggemar",
+    statVotes: "Suara", statPi: "Pi Terkumpul", statPts: "Poin / 1π",
+    p4pSec: "P4P Pria · Peringkat Suara Penggemar",
+    voteFor: "Pilih", voteCost: "Biaya Suara", toFighter: "Untuk Petarung",
+    walletNote: "1 Pi dikirim ke dompet Pi penyelenggara:",
+    confirmVote: "KONFIRMASI — 1π",
+    champion: "JUARA", tabP4P: "🏆 P4P TOP-15",
+    toastSuccess: "Suara dihitung untuk", toastPts: "+100 pts",
+    toastError: "Pembayaran dibatalkan atau gagal. Coba lagi.",
+    pts: "pts", loading: "MEMPROSES…",
+    disclaimer: "Aplikasi ini adalah proyek penggemar dan tidak berafiliasi, didukung, или disponsori oleh organisasi olahraga profesional mana pun.",
+    p4pOfficialRank: "Peringkat resmi",
+  },
+  zh: {
+    subtitle: "磅磅制 · 球迷排行榜",
+    statVotes: "投票数", statPi: "已收Pi", statPts: "积分 / 1π",
+    p4pSec: "男子P4P · 球迷投票排行榜",
+    voteFor: "投票给", voteCost: "投票费用", toFighter: "给选手",
+    walletNote: "1 Pi 将发送至主办方的Pi钱包：",
+    confirmVote: "确认投票 — 1π",
+    champion: "冠军", tabP4P: "🏆 P4P 前15名",
+    toastSuccess: "投票成功", toastPts: "+100分",
+    toastError: "付款已取消或失败，请重试。",
+    pts: "分", loading: "处理中…",
+    disclaimer: "本应用程序为球迷自发项目，与任何职业体育组织无任何关联、背书或赞助关系。",
+    p4pOfficialRank: "官方排名",
+  },
+  ja: {
+    subtitle: "パウンド・フォー・パウンド · ファンランキング",
+    statVotes: "投票数", statPi: "Pi収集", statPts: "ポイント / 1π",
+    p4pSec: "男子P4P · ファン投票ランキング",
+    voteFor: "投票する", voteCost: "投票コスト", toFighter: "選手に",
+    walletNote: "1 Piは主催者のPiウォレットに送信されます：",
+    confirmVote: "投票を確認 — 1π",
+    champion: "チャンピオン", tabP4P: "🏆 P4P TOP-15",
+    toastSuccess: "投票が記録されました", toastPts: "+100pt",
+    toastError: "支払いがキャンセルまたは失敗しました。もう一度お試しください。",
+    pts: "pt", loading: "処理中…",
+    disclaimer: "このアプリはファンプロジェクトであり、いかなるプロスポーツ組織とも提携、推薦、スポンサー関係にありません。",
+    p4pOfficialRank: "公式ランク",
+  },
+  ko: {
+    subtitle: "파운드 포 파운드 · 팬 랭킹",
+    statVotes: "투표 수", statPi: "Pi 수집", statPts: "포인트 / 1π",
+    p4pSec: "남자 P4P · 팬 투표 리더보드",
+    voteFor: "투표하기", voteCost: "투표 비용", toFighter: "선수에게",
+    walletNote: "1 Pi는 주최자의 Pi 지갑으로 전송됩니다:",
+    confirmVote: "투표 확인 — 1π",
+    champion: "챔피언", tabP4P: "🏆 P4P TOP-15",
+    toastSuccess: "투표 완료", toastPts: "+100pt",
+    toastError: "결제가 취소되었거나 실패했습니다. 다시 시도해 주세요.",
+    pts: "pt", loading: "처리 중…",
+    disclaimer: "이 앱은 팬 프로젝트이며 어떠한 전문 스포츠 기관과도 제휴, 보증 또는 후원 관계가 없습니다.",
+    p4pOfficialRank: "공식 순위",
+  }
+};
+
+const EXTRA_GLOSSARY = {
+  en: {
+    limit: "Limit", contender: "Division Contender", ranking: "Ranking", vote: "Vote",
+    flyweight: "Flyweight", bantamweight: "Bantamweight", featherweight: "Featherweight", lightweight: "Lightweight",
+    welterweight: "Welterweight", middleweight: "Middleweight", lightheavyweight: "Light Heavyweight", heavyweight: "Heavyweight",
+    settings: "Settings", login: "Login", pioneerrating: "Pioneer"
+  },
+  ru: {
+    limit: "Лимит", contender: "Претендент дивизиона", ranking: "Рейтинг", vote: "Голосовать",
+    flyweight: "Наилегчайший вес", bantamweight: "Легчайший вес", featherweight: "Полулегкий вес", lightweight: "Легкий вес",
+    welterweight: "Полусредний вес", middleweight: "Средний вес", lightheavyweight: "Полутяжелый вес", heavyweight: "Тяжелый вес",
+    settings: "Настройки", login: "Вход", pioneerrating: "Пионер"
+  },
+  ar: {
+    limit: "الحد", contender: "منافس القسم", ranking: "التصنيف", vote: "تصويت",
+    flyweight: "وزن الذبابة", bantamweight: "وزن الديك", featherweight: "وزن الريشة", lightweight: "الوزن الخفيف",
+    welterweight: "وزن الوسط", middleweight: "الوزن المتوسط", lightheavyweight: "وزن خفيف الثقيل", heavyweight: "الوزن الثقيل",
+    settings: "الإعدادات", login: "دخول", pioneerrating: "رائد"
+  },
+  fr: {
+    limit: "Limite", contender: "Aspirant de Division", ranking: "Classement", vote: "Voter",
+    flyweight: "Poids Mouches", bantamweight: "Poids Coqs", featherweight: "Poids Plumes", lightweight: "Poids Légers",
+    welterweight: "Poids Mi-moyens", middleweight: "Poids Moyens", lightheavyweight: "Poids Mi-lourds", heavyweight: "Poids Lourds",
+    settings: "Paramètres", login: "Connexion", pioneerrating: "Pionnier"
+  },
+  de: {
+    limit: "Limit", contender: "Herausforderer", ranking: "Rangliste", vote: "Abstimmen",
+    flyweight: "Fliegengewicht", bantamweight: "Bantamgewicht", featherweight: "Federgewicht", lightweight: "Leichtgewicht",
+    welterweight: "Weltergewicht", middleweight: "Mittelgewicht", lightheavyweight: "Halbschwergewicht", heavyweight: "Schwergewicht",
+    settings: "Optionen", login: "Anmelden", pioneerrating: "Pionier"
+  },
+  it: {
+    limit: "Limite", contender: "Sfidante Divisione", ranking: "Posizione", vote: "Vota",
+    flyweight: "Pesi Mosca", bantamweight: "Pesi Gallo", featherweight: "Pesi Piuma", lightweight: "Pesi Leggeri",
+    welterweight: "Pesi Welter", middleweight: "Pesi Medi", lightheavyweight: "Pesi Massimi Leggeri", heavyweight: "Pesi Massimi",
+    settings: "Opzioni", login: "Accedi", pioneerrating: "Pionieri"
+  },
+  fil: {
+    limit: "Limitasyon", contender: "Kabilang sa Division", ranking: "Posisyon", vote: "Bumoto",
+    flyweight: "Flyweight", bantamweight: "Bantamweight", featherweight: "Featherweight", lightweight: "Lightweight",
+    welterweight: "Welterweight", middleweight: "Middleweight", lightheavyweight: "Light Heavyweight", heavyweight: "Heavyweight",
+    settings: "Mga Option", login: "Log In", pioneerrating: "Pioneer"
+  },
+  id: {
+    limit: "Batas", contender: "Penantang Divisi", ranking: "Peringkat", vote: "Pilih",
+    flyweight: "Kelas Terbang", bantamweight: "Kelas Bantam", featherweight: "Kelas Bulu", lightweight: "Kelas Ringan",
+    welterweight: "Kelas Welter", middleweight: "Kelas Menengah", lightheavyweight: "Kelas Berat Ringan", heavyweight: "Kelas Berat",
+    settings: "Setelan", login: "Masuk", pioneerrating: "Pelopor"
+  },
+  zh: {
+    limit: "限制", contender: "级别挑战者", ranking: "排名", vote: "投票",
+    flyweight: "蝇量级", bantamweight: "雏量级", featherweight: "羽量级", lightweight: "轻量级",
+    welterweight: "次中量级", middleweight: "中量级", lightheavyweight: "轻重量级", heavyweight: "重量级",
+    settings: "设置", login: "登录", pioneerrating: "先锋"
+  },
+  ja: {
+    limit: "制限", contender: "階級コンテンダー", ranking: "順位", vote: "投票",
+    flyweight: "フライ級", bantamweight: "バンタム級", featherweight: "フェザー級", lightweight: "ライト級",
+    welterweight: "ウェルター級", middleweight: "ミドル級", lightheavyweight: "ライトヘビー級", heavyweight: "ヘビー級",
+    settings: "設定", login: "ログイン", pioneerrating: "パイオニア"
+  },
+  ko: {
+    limit: "체중 제한", contender: "디비전 컨텐더", ranking: "순위", vote: "투표",
+    flyweight: "플лай급", bantamweight: "밴텀급", featherweight: "페더급", lightweight: "라이트급",
+    welterweight: "웰터급", middleweight: "미들급", lightheavyweight: "라이트헤비급", heavyweight: "헤비급",
+    settings: "설정", login: "로그인", pioneerrating: "파이오니어"
+  }
+};
+
+const RTL_LANGS = ['ar'];
+let curLang = 'en';
+
+function T(k) {
+  const normalizedKey = typeof k === 'string' ? k.toLowerCase().replace(/\s+/g, '') : '';
+  const val = (LANG[curLang] || LANG.en)[k] || (EXTRA_GLOSSARY[curLang] || EXTRA_GLOSSARY.en)[k] || (EXTRA_GLOSSARY[curLang] || EXTRA_GLOSSARY.en)[normalizedKey];
+  return val || k;
+}
+
+function setLang(lang) {
+  curLang = lang;
+  document.documentElement.lang = lang;
+  document.dir = RTL_LANGS.includes(lang) ? 'rtl' : 'ltr';
+  // Update all static i18n elements
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    el.textContent = T(el.getAttribute('data-i18n'));
+  });
+  // Re-render dynamic content
+  buildNavTabs();
+  renderAll();
+}
+
+/* =========================================================
+   THEME TOGGLE
+   ========================================================= */
+let isDark = true;
+function toggleTheme() {
+  isDark = !isDark;
+  document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+}
+
+/* =========================================================
+   FIGHTER DATA & GRADIENT GENERATION (Initials Fallbacks)
+   ========================================================= */
+function nameToGradient(name) {
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) & 0xFFFFFF;
+  const hue = h % 360;
+  return `linear-gradient(135deg, hsl(${hue},55%,28%) 0%, hsl(${(hue+40)%360},60%,38%) 100%)`;
+}
+function nameInitials(name) {
+  return name.split(' ').slice(0,2).map(w => w[0] || '').join('').toUpperCase();
+}
+function fallbackDiv(name) {
+  const grad = nameToGradient(name);
+  const init = nameInitials(name);
+  return `<div class="ph" style="background:${grad};color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:inherit;letter-spacing:1px;">${init}</div>`;
+}
+
+/* ---- P4P Official Top-15 ---- */
+const P4P_LIST = [
+  { name:'Islam Makhachev',      flag:'🇷🇺', div:'Welterweight / Lightweight', record:'28-1'   },
+  { name:'Ilia Topuria',         flag:'🇬🇪', div:'Lightweight / Featherweight',record:'17-0'   },
+  { name:'Alex Pereira',         flag:'🇧🇷', div:'Light Heavyweight',          record:'12-2'   },
+  { name:'Alexander Volkanovski',flag:'🇦🇺', div:'Featherweight',              record:'26-3'   },
+  { name:'Petr Yan',             flag:'🇷🇺', div:'Bantamweight',               record:'17-5'   },
+  { name:'Joshua Van',           flag:'🇦🇺', div:'Flyweight',                  record:'15-3'   },
+  { name:'Khamzat Chimaev',      flag:'🇸🇪', div:'Middleweight',               record:'15-1'   },
+  { name:'Tom Aspinall',         flag:'🇬🇧', div:'Heavyweight',                record:'15-3'   },
+  { name:'Sean Strickland',      flag:'🇺🇸', div:'Middleweight',               record:'31-7'   },
+  { name:'Alexandre Pantoja',    flag:'🇧🇷', div:'Flyweight',                  record:'30-5'   },
+  { name:'Arman Tsarukyan',      flag:'🇦🇲', div:'Lightweight',                record:'23-3'   },
+  { name:'Dricus Du Plessis',    flag:'🇿🇦', div:'Middleweight',               record:'23-3'   },
+  { name:'Carlos Ulberg',        flag:'🇳🇿', div:'Light Heavyweight',          record:'14-1'   },
+  { name:'Merab Dvalishvili',    flag:'🇬🇪', div:'Bantamweight',               record:'18-4'   },
+  { name:'Justin Gaethje',       flag:'🇺🇸', div:'Lightweight',                record:'27-5'   },
+];
+
+/* ---- Helper to map weight class athletes to P4P key ---- */
+function getP4PKey(name) {
+  const pIdx = P4P_LIST.findIndex(f => f.name.toLowerCase() === name.toLowerCase());
+  if (pIdx !== -1) {
+    return `p4p_${pIdx}`;
+  }
+  return `p4p_notlist_${name.toLowerCase().replace(/[^a-z0-9]/g, '_')}`;
+}
+
+/* ---- Weight class data ---- */
+const WEIGHT_CLASSES = [
+  {
+    id: 'flyweight', icon: '⚡',
+    label: 'FLYWEIGHT', limit: '125 lb / 56.7 kg',
+    champ: { name:'Joshua Van', flag:'🇦🇺', record:'14-3' },
+    fighters: [
+      { rank:1,  name:'Alexandre Pantoja',    flag:'🇧🇷', record:'30-5'   },
+      { rank:2,  name:'Manel Kape',           flag:'🇦🇴', record:'19-7'   },
+      { rank:3,  name:'Tatsuro Taira',        flag:'🇯🇵', record:'16-0'   },
+      { rank:4,  name:'Brandon Royval',       flag:'🇺🇸', record:'16-8'   },
+      { rank:5,  name:'Kyoji Horiguchi',      flag:'🇯🇵', record:'32-5'   },
+      { rank:6,  name:"Lone'er Kavanagh",     flag:'🇩🇰', record:'14-3'   },
+      { rank:7,  name:'Amir Albazi',          flag:'🇸🇪', record:'18-3'   },
+      { rank:8,  name:'Asu Almabayev',        flag:'🇰🇿', record:'14-2'   },
+      { rank:9,  name:'Brandon Moreno',       flag:'🇲🇽', record:'22-7-1' },
+      { rank:10, name:'Alex Perez',           flag:'🇺🇸', record:'12-5'   },
+      { rank:11, name:'Tim Elliott',          flag:'🇺🇸', record:'19-13-1'},
+      { rank:12, name:'Steve Erceg',          flag:'🇦🇺', record:'13-3'   },
+      { rank:13, name:'Charles Johnson',      flag:'🇺🇸', record:'16-5'   },
+      { rank:14, name:'Tagir Ulanbekov',      flag:'🇷🇺', record:'15-3'   },
+      { rank:15, name:'Bruno Silva',          flag:'🇧🇷', record:'24-11'  },
+    ]
+  },
+  {
+    id: 'bantamweight', icon: '🥊',
+    label: 'BANTAMWEIGHT', limit: '135 lb / 61.2 kg',
+    champ: { name:'Petr Yan', flag:'🇷🇺', record:'17-5' },
+    fighters: [
+      { rank:1,  name:'Merab Dvalishvili',    flag:'🇬🇪', record:'18-4'   },
+      { rank:2,  name:'Umar Nurmagomedov',    flag:'🇷🇺', record:'18-0'   },
+      { rank:3,  name:"Sean O'Malley",        flag:'🇺🇸', record:'18-2'   },
+      { rank:4,  name:'Cory Sandhagen',       flag:'🇺🇸', record:'17-5'   },
+      { rank:5,  name:'Song Yadong',          flag:'🇨🇳', record:'22-8-1' },
+      { rank:6,  name:'Aiemann Zahabi',       flag:'🇨🇦', record:'18-3'   },
+      { rank:7,  name:'Deiveson Figueiredo',  flag:'🇧🇷', record:'23-4-1' },
+      { rank:8,  name:'Mario Bautista',       flag:'🇺🇸', record:'14-3'   },
+      { rank:9,  name:'David Martinez',       flag:'🇪🇸', record:'14-3'   },
+      { rank:10, name:'Marlon Vera',          flag:'🇪🇨', record:'23-10'  },
+      { rank:11, name:'Payton Talbott',       flag:'🇺🇸', record:'12-2'   },
+      { rank:12, name:'Vinicius Oliveira',    flag:'🇧🇷', record:'23-4'   },
+      { rank:13, name:'Raul Rosas Jr.',       flag:'🇲🇽', record:'12-3'   },
+      { rank:14, name:'Montel Jackson',       flag:'🇺🇸', record:'16-7'   },
+      { rank:15, name:'Farid Basharat',       flag:'🇦🇫', record:'16-1'   },
+    ]
+  },
+  {
+    id: 'featherweight', icon: '🦅',
+    label: 'FEATHERWEIGHT', limit: '145 lb / 65.8 kg',
+    champ: { name:'Alexander Volkanovski', flag:'🇦🇺', record:'26-3' },
+    fighters: [
+      { rank:1,  name:'Movsar Evloev',        flag:'🇷🇺', record:'18-0'   },
+      { rank:2,  name:'Diego Lopes',          flag:'🇧🇷', record:'25-7'   },
+      { rank:3,  name:'Lerone Murphy',        flag:'🇬🇧', record:'15-0-1' },
+      { rank:4,  name:'Yair Rodriguez',       flag:'🇲🇽', record:'16-5'   },
+      { rank:5,  name:'Aljamain Sterling',    flag:'🇺🇸', record:'24-5'   },
+      { rank:6,  name:'Jean Silva',           flag:'🇧🇷', record:'14-2'   },
+      { rank:7,  name:'Youssef Zalal',        flag:'🇲🇦', record:'19-7'   },
+      { rank:8,  name:'Arnold Allen',         flag:'🇬🇧', record:'19-2'   },
+      { rank:9,  name:'Steve Garcia',         flag:'🇺🇸', record:'16-7'   },
+      { rank:10, name:'Kevin Vallejos',       flag:'🇺🇾', record:'14-4'   },
+      { rank:11, name:'Brian Ortega',         flag:'🇺🇸', record:'16-4'   },
+      { rank:12, name:'Melquizael Costa',     flag:'🇧🇷', record:'16-3'   },
+      { rank:13, name:'Aaron Pico',           flag:'🇺🇸', record:'11-4'   },
+      { rank:14, name:'David Onama',          flag:'🇺🇬', record:'16-5'   },
+      { rank:15, name:'Patricio Pitbull',     flag:'🇧🇷', record:'35-5'   },
+    ]
+  },
+  {
+    id: 'lightweight', icon: '💨',
+    label: 'LIGHTWEIGHT', limit: '155 lb / 70.3 kg',
+    champ: { name:'Ilia Topuria', flag:'🇬🇪', record:'17-0' },
+    fighters: [
+      { rank:1,  name:'Justin Gaethje',       flag:'🇺🇸', record:'27-5',  note:'Interim' },
+      { rank:2,  name:'Arman Tsarukyan',      flag:'🇦🇲', record:'23-3'   },
+      { rank:3,  name:'Charles Oliveira',     flag:'🇧🇷', record:'37-11'  },
+      { rank:4,  name:'Max Holloway',         flag:'🇺🇸', record:'27-9'   },
+      { rank:5,  name:'Benoît Saint Denis',   flag:'🇫🇷', record:'17-3'   },
+      { rank:6,  name:'Paddy Pimblett',       flag:'🇬🇧', record:'23-4'   },
+      { rank:7,  name:'Mateusz Gamrot',       flag:'🇵🇱', record:'26-4'   },
+      { rank:8,  name:'Dan Hooker',           flag:'🇳🇿', record:'24-14'  },
+      { rank:9,  name:'Renato Moicano',       flag:'🇧🇷', record:'21-6-1' },
+      { rank:10, name:'Mauricio Ruffy',       flag:'🇧🇷', record:'13-0'   },
+      { rank:11, name:'Rafael Fiziev',        flag:'🇰🇿', record:'15-4'   },
+      { rank:12, name:'Beneil Dariush',       flag:'🇺🇸', record:'22-5-1' },
+      { rank:13, name:'Michael Chandler',     flag:'🇺🇸', record:'23-9'   },
+      { rank:14, name:'Manuel Torres',        flag:'🇲🇽', record:'18-3'   },
+      { rank:15, name:'Farès Ziam',           flag:'🇫🇷', record:'17-6'   },
+    ]
+  },
+  {
+    id: 'welterweight', icon: '💪',
+    label: 'WELTERWEIGHT', limit: '170 lb / 77.1 kg',
+    champ: { name:'Islam Makhachev', flag:'🇷🇺', record:'28-1', note:'Dual Champ' },
+    fighters: [
+      { rank:1,  name:'Ian Machado Garry',    flag:'🇮🇪', record:'17-1'   },
+      { rank:2,  name:'Carlos Prates',        flag:'🇧🇷', record:'24-7'   },
+      { rank:3,  name:'Michael Morales',      flag:'🇪🇨', record:'19-0'   },
+      { rank:4,  name:'Jack Della Maddalena', flag:'🇦🇺', record:'18-4'   },
+      { rank:5,  name:'Belal Muhammad',       flag:'🇺🇸', record:'24-5'   },
+      { rank:6,  name:'Sean Brady',           flag:'🇺🇸', record:'19-2'   },
+      { rank:7,  name:'Leon Edwards',         flag:'🇬🇧', record:'22-6'   },
+      { rank:8,  name:'Kamaru Usman',         flag:'🇳🇬', record:'21-4'   },
+      { rank:9,  name:'Joaquin Buckley',      flag:'🇺🇸', record:'21-8'   },
+      { rank:10, name:'Rafael Bonfim',        flag:'🇧🇷', record:'19-1'   },
+      { rank:11, name:'Gilbert Burns',        flag:'🇧🇷', record:'23-7'   },
+      { rank:12, name:'Michael Venom Page',   flag:'🇬🇧', record:'22-4'   },
+      { rank:13, name:'Uroš Medić',           flag:'🇷🇸', record:'16-3'   },
+      { rank:14, name:'Daniel Rodriguez',     flag:'🇺🇸', record:'18-5'   },
+      { rank:15, name:'Colby Covington',      flag:'🇺🇸', record:'17-5'   },
+    ]
+  },
+  {
+    id: 'middleweight', icon: '🔥',
+    label: 'MIDDLEWEIGHT', limit: '185 lb / 83.9 kg',
+    champ: { name:'Sean Strickland', flag:'🇺🇸', record:'31-7' },
+    fighters: [
+      { rank:1,  name:'Dricus Du Plessis',    flag:'🇿🇦', record:'23-3'   },
+      { rank:2,  name:'Nassourdine Imavov',   flag:'🇷🇺', record:'17-4'   },
+      { rank:3,  name:'Khamzat Chimaev',      flag:'🇸🇪', record:'15-1'   },
+      { rank:4,  name:'Caio Borralho',        flag:'🇧🇷', record:'18-2'   },
+      { rank:5,  name:'Robert Whittaker',     flag:'🇦🇺', record:'26-9'   },
+      { rank:6,  name:'Joe Pyfer',            flag:'🇺🇸', record:'16-3'   },
+      { rank:7,  name:'Brendan Allen',        flag:'🇺🇸', record:'24-6'   },
+      { rank:8,  name:'Reinier de Ridder',    flag:'🇳🇱', record:'21-4'   },
+      { rank:9,  name:'Israel Adesanya',      flag:'🇳🇿', record:'24-6'   },
+      { rank:10, name:'Michel Pereira',       flag:'🇧🇷', record:'31-12'  },
+      { rank:11, name:'Jared Cannonier',      flag:'🇺🇸', record:'18-9'   },
+      { rank:12, name:'Bo Nickal',            flag:'🇺🇸', record:'9-0'    },
+      { rank:13, name:'Paulo Costa',          flag:'🇧🇷', record:'16-4'   },
+      { rank:14, name:'Abus Magomedov',       flag:'🇷🇺', record:'28-5'   },
+      { rank:15, name:'Chris Curtis',         flag:'🇺🇸', record:'26-7'   },
+    ]
+  },
+  {
+    id: 'lightheavyweight', icon: '🦁',
+    label: 'LIGHT HEAVYWEIGHT', limit: '205 lb / 92.9 kg',
+    champ: { name:'Carlos Ulberg', flag:'🇳🇿', record:'13-1' },
+    fighters: [
+      { rank:1,  name:'Magomed Ankalaev',     flag:'🇷🇺', record:'19-1-1' },
+      { rank:2,  name:'Jiří Procházka',       flag:'🇨🇿', record:'30-5-1' },
+      { rank:3,  name:'Alex Pereira',         flag:'🇧🇷', record:'11-2'   },
+      { rank:4,  name:'Aleksandar Rakić',     flag:'🇦🇹', record:'16-4'   },
+      { rank:5,  name:'Jamahal Hill',         flag:'🇺🇸', record:'13-3'   },
+      { rank:6,  name:'Paulo Costa',          flag:'🇧🇷', record:'15-4'   },
+      { rank:7,  name:'Azamat Murzakanov',    flag:'🇷🇺', record:'13-2'   },
+      { rank:8,  name:'Dominick Reyes',       flag:'🇺🇸', record:'15-5'   },
+      { rank:9,  name:'Johnny Walker',        flag:'🇧🇷', record:'23-8'   },
+      { rank:10, name:'Volkan Oezdemir',      flag:'🇨🇭', record:'19-7'   },
+      { rank:11, name:'Khalil Rountree Jr.',  flag:'🇺🇸', record:'14-5'   },
+      { rank:12, name:'Anthony Smith',        flag:'🇺🇸', record:'37-18'  },
+      { rank:13, name:'Ovince Saint Preux',   flag:'🇺🇸', record:'29-16'  },
+      { rank:14, name:'Ryan Spann',           flag:'🇺🇸', record:'21-10'  },
+      { rank:15, name:'Nikita Krylov',        flag:'🇺🇦', record:'29-9'   },
+    ]
+  },
+  {
+    id: 'heavyweight', icon: '🏔️',
+    label: 'HEAVYWEIGHT', limit: '265 lb / 120.2 kg',
+    champ: { name:'Tom Aspinall', flag:'🇬🇧', record:'15-3' },
+    fighters: [
+      { rank:1,  name:'Ciryl Gane',           flag:'🇫🇷', record:'13-2'   },
+      { rank:2,  name:'Alexander Volkov',     flag:'🇷🇺', record:'40-11'  },
+      { rank:3,  name:'Sergei Pavlovich',     flag:'🇷🇺', record:'20-3'   },
+      { rank:4,  name:'Jailton Almeida',      flag:'🇧🇷', record:'22-3'   },
+      { rank:5,  name:'Josh Hokit',           flag:'🇺🇸', record:'9-0'    },
+      { rank:6,  name:'Sergei Spivac',        flag:'🇲🇩', record:'18-6'   },
+      { rank:7,  name:'Curtis Blaydes',       flag:'🇺🇸', record:'19-6'   },
+      { rank:8,  name:'Tai Tuivasa',          flag:'🇦🇺', record:'15-7'   },
+      { rank:9,  name:'Derrick Lewis',        flag:'🇺🇸', record:'26-13'  },
+      { rank:10, name:'Marcin Tybura',        flag:'🇵🇱', record:'25-8'   },
+      { rank:11, name:'Shamil Gaziev',        flag:'🇷🇺', record:'12-1'   },
+      { rank:12, name:'Rodrigo Nascimento',   flag:'🇧🇷', record:'15-1'   },
+      { rank:13, name:'Alexandr Romanov',     flag:'🇲🇩', record:'17-4'   },
+      { rank:14, name:'Ben Rothwell',         flag:'🇺🇸', record:'39-14'  },
+      { rank:15, name:'Greg Hardy',           flag:'🇺🇸', record:'7-8'    },
+    ]
+  }
+];
+
+/* =========================================================
+   STATE SETUP
+   ========================================================= */
+const state = {
+  scores: {},          // key → points
+  totalVotes: 0,
+  totalPi: 0,
+  pending: null,       // { scoreKey, name, flag, division }
+  piReady: false,
+};
+
+/* ---- Pre-populate starting values locally to avoid empty scoreboard ---- */
+function initDefaultScores() {
+  P4P_LIST.forEach((_, idx) => {
+    state.scores[`p4p_${idx}`] = 2000 - idx * 100;
+  });
+  WEIGHT_CLASSES.forEach((wc) => {
+    const champKey = getP4PKey(wc.champ.name);
+    if (state.scores[champKey] === undefined) {
+      state.scores[champKey] = 1200;
+    }
+    wc.fighters.forEach((f, idx) => {
+      const fKey = getP4PKey(f.name);
+      if (state.scores[fKey] === undefined) {
+        state.scores[fKey] = (15 - idx) * 100 + 100;
+      }
+    });
+  });
+}
+
+/* =========================================================
+   PI SDK INTEGRATION
+   ========================================================= */
+var API_BASE = '/api';
+
+/* ---- Load globally persisted scores from Replit ---- */
+function loadVotesFromServer() {
+  fetch(API_BASE + '/votes')
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data && Array.isArray(data.votes)) {
+        data.votes.forEach(function(v) {
+          state.scores[v.fighter_key] = Math.round((Number(v.points) || 0) / 100) * 100;
+        });
+        
+        // Recalculate totals
+        let votesCount = 0;
+        let piCount = 0;
+        Object.keys(state.scores).forEach(function(k) {
+          votesCount += Math.floor(state.scores[k] / 100);
+          piCount += state.scores[k] / 100;
+        });
+        
+        state.totalVotes = votesCount;
+        state.totalPi = piCount;
+        
+        renderAll();
+        console.log('[DB] Loaded', data.votes.length, 'fighters from backend');
+      }
+    })
+    .catch(function(e) { console.warn('[DB] Could not load votes from server:', e.message); });
+}
+
+/* ---- Save an authenticated vote to Replit backend ---- */
+function saveVoteToServer(fighterKey, fighterName, division, points, piAmount) {
+  var currentScore = state.scores[fighterKey] || 0;
+  var basePoints = currentScore - points; // original baseline points before this increment
+
+  fetch(API_BASE + '/votes', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      fighter_key:  fighterKey,
+      fighter_name: fighterName,
+      division:     division,
+      points:       points,
+      pi_amount:    piAmount,
+      base_points:  basePoints
+    })
+  }).catch(function(e) { console.warn('[DB] Could not save vote to server:', e.message); });
+}
+
+var PI_WALLET    = 'GCXCW4REFA6PMYKOOI5N7F53P4HJR2SETBIOVTVH3ZAFFG35G47OMTWG';
+var _authReady   = false;
+var _hasPayments = false; 
+
+function initPi() {
+  if (typeof Pi === 'undefined') {
+    _authReady   = true;
+    _hasPayments = true; // demo execution fallback
+    console.warn('[Pi] Running outside Pi Browser - Sandbox simulator enabled');
+    return;
+  }
+  Pi.init({ version: '2.0', sandbox: true });
+
+  Pi.authenticate(
+    ['username', 'payments'],
+    function onIncompletePaymentFound(pmt) {
+      console.log('[Pi] Unresolved payment discovered:', pmt && pmt.id);
+      if (pmt && pmt.identifier) {
+        fetch('/api/complete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ paymentId: pmt.identifier, txid: pmt.transaction && pmt.transaction.txid || 'unknown' })
+        }).catch(function(){});
+      }
+    }
+  )
+  .then(function(auth) {
+    _authReady   = true;
+    _hasPayments = !!(auth && auth.accessToken);
+    state.piReady = true;
+    console.log('[Pi] Success authenticating. Payments support unlocked: ', _hasPayments);
+  })
+  .catch(function(err) {
+    _authReady   = true;
+    _hasPayments = false;
+    state.piReady = true;
+    console.warn('[Pi] Authentication error:', err);
+  });
+}
+
+function piPay(data, cbs) {
+  // If we are running in a regular browser (outside Pi Browser) or during development/testing
+  var isPiBrowser = /PiBrowser/i.test(navigator.userAgent) || window.location.href.includes('pi-app') || (typeof window.Pi !== 'undefined' && _hasPayments);
+  
+  if (typeof Pi === 'undefined' || !isPiBrowser) {
+    console.log('[Pi Sandbox Simulation] Emulating safe payment flow in external test environment.');
+    setTimeout(function() { cbs.onReadyForServerApproval && cbs.onReadyForServerApproval('demo_payment_approval_id'); }, 300);
+    setTimeout(function() { cbs.onReadyForServerCompletion && cbs.onReadyForServerCompletion('demo_payment_approval_id', 'demo_transaction_completed_hash_' + Date.now()); }, 1000);
+    return;
+  }
+
+  if (!_hasPayments) {
+    Pi.authenticate(['username', 'payments'], function(){})
+    .then(function(auth) {
+      _hasPayments = !!(auth && auth.accessToken);
+      if (_hasPayments) {
+        try { Pi.createPayment(data, cbs); }
+        catch(e) { if (cbs.onError) cbs.onError(e, null); }
+      } else {
+        if (cbs.onError) cbs.onError({ message: 'Службы платежей недоступны вне защищенной среды.' }, null);
+      }
+    })
+    .catch(function(e) {
+      // If we failed to authenticate, fall back to simulation for tester convenience
+      console.warn('[Pi SDK] Authentication failed. Falling back to simulated payment for development preview.');
+      setTimeout(function() { cbs.onReadyForServerApproval && cbs.onReadyForServerApproval('demo_payment_approval_id'); }, 300);
+      setTimeout(function() { cbs.onReadyForServerCompletion && cbs.onReadyForServerCompletion('demo_payment_approval_id', 'demo_transaction_completed_hash_' + Date.now()); }, 1000);
+    });
+    return;
+  }
+  try {
+    Pi.createPayment(data, cbs);
+  } catch(e) {
+    console.error('[Pi] createPayment threw error:', e);
+    if (cbs.onError) cbs.onError(e, null);
+  }
+}
+
+/* =========================================================
+   NAVIGATION BUILD
+   ========================================================= */
+function buildNavTabs() {
+  const tabs = document.getElementById('navTabs');
+  let html = `<button class="nav-tab active" onclick="showPage('p4p',this)">${T('tabP4P')}</button>`;
+  WEIGHT_CLASSES.forEach(wc => {
+    html += `<button class="nav-tab" onclick="showPage('${wc.id}',this)">${T(wc.id).toUpperCase()}</button>`;
+  });
+  tabs.innerHTML = html;
+}
+
+/* =========================================================
+   BUILD WEIGHT CLASS PAGES (VANILLA JS METHOD)
+   ========================================================= */
+function buildWeightPages() {
+  const main = document.getElementById('appMain');
+  WEIGHT_CLASSES.forEach(wc => {
+    const div = document.createElement('div');
+    div.className = 'page';
+    div.id = `page-${wc.id}`;
+    div.innerHTML = `
+      <div class="page-inner">
+        <div class="weight-header">
+          <div>
+            <div class="weight-title" id="weight-title-${wc.id}">${T(wc.id).toUpperCase()}</div>
+            <div class="weight-limit" id="weight-limit-${wc.id}">${T('limit')} — ${wc.limit}</div>
+          </div>
+        </div>
+        <div class="champ-card">
+          <div>
+            <div class="champ-label-tag" data-i18n="champion">${T('champion')}</div>
+            <div class="champ-name"><span class="flag">${wc.champ.flag}</span>${wc.champ.name}${wc.champ.note ? `<span class="tag-note" id="champ-note-${wc.id}">${wc.champ.note}</span>` : ''}</div>
+            <div class="champ-record" id="champ-rec-${wc.id}">${wc.champ.record}</div>
+          </div>
+          <div style="margin-left:auto; display:flex; align-items:center; gap: 14px;">
+            <div style="text-align: right;">
+              <div id="champ-pts-${wc.id}" style="font-family:'Share Tech Mono', monospace; font-size:14px; color:var(--gold); font-weight:700;">0 pts</div>
+            </div>
+            <button class="btn-vote" id="champ-vote-${wc.id}">1π</button>
+          </div>
+        </div>
+        <div class="fighter-list" id="list-${wc.id}"></div>
+      </div>`;
+    main.appendChild(div);
+  });
+}
+
+/* =========================================================
+   RENDER P4P LEADERBOARD
+   ========================================================= */
+function translateDivision(divStr) {
+  if (!divStr) return '';
+  return divStr
+    .split('/')
+    .map(part => {
+      const trimmed = part.trim().toLowerCase().replace(/\s+/g, '');
+      return T(trimmed);
+    })
+    .join(' / ');
+}
+
+function renderP4P() {
+  const enriched = P4P_LIST.map((f, i) => ({
+    ...f,
+    officialRank: i + 1,
+    pts: state.scores[`p4p_${i}`] || 0
+  }));
+  // Sort by votes points descending, then by original rank ascending
+  enriched.sort((a, b) => b.pts - a.pts || a.officialRank - b.officialRank);
+
+  const maxPts = Math.max(1, ...enriched.map(f => f.pts));
+  const container = document.getElementById('p4pList');
+  container.innerHTML = '';
+
+  enriched.forEach((f, idx) => {
+    const fanRank = idx + 1;
+    const pct = Math.round((f.pts / maxPts) * 100);
+    const rankClass = fanRank === 1 ? 'gold' : fanRank === 2 ? 'silver' : fanRank === 3 ? 'bronze' : '';
+    
+    const card = document.createElement('div');
+    card.className = 'p4p-card';
+    card.setAttribute('data-rank', fanRank);
+    card.innerHTML = `
+      <div class="rank-num ${rankClass}">${fanRank}</div>
+      <div class="fighter-info">
+        <div class="fighter-name"><span class="flag">${f.flag}</span>${f.name}</div>
+        <div class="fighter-meta">${translateDivision(f.div)} · ${f.record} · ${T('p4pOfficialRank')} #${f.officialRank}</div>
+      </div>
+      <div class="score-wrap">
+        <div class="score-pts">${f.pts > 0 ? f.pts.toLocaleString() + ' ' + T('pts') : '0 ' + T('pts')}</div>
+        <div class="score-bar-bg"><div class="score-bar-fill" style="width:${pct}%"></div></div>
+      </div>
+      <button class="btn-vote" id="vote-p4p-${idx}">1π</button>
+    `;
+    container.appendChild(card);
+
+    // Dynamic click binding with localized division terms
+    const btn = document.getElementById(`vote-p4p-${idx}`);
+    if (btn) {
+      btn.onclick = function() {
+        openModal(f.name, f.flag, translateDivision(f.div), idx);
+      };
+    }
+  });
+}
+
+/* =========================================================
+   RENDER WEIGHT CLASS FIGHTER LIST WITH INDIVIDUAL VOTE BUTTONS
+   ========================================================= */
+function renderWeightClass(wc) {
+  const container = document.getElementById(`list-${wc.id}`);
+  if (!container) return;
+  container.innerHTML = '';
+
+  // Update dynamic header text content
+  const titleEl = document.getElementById(`weight-title-${wc.id}`);
+  if (titleEl) titleEl.textContent = T(wc.id).toUpperCase();
+
+  const limitEl = document.getElementById(`weight-limit-${wc.id}`);
+  if (limitEl) limitEl.textContent = T('limit') + ': ' + wc.limit;
+
+  const champNoteEl = document.getElementById(`champ-note-${wc.id}`);
+  if (champNoteEl && wc.champ.note) {
+    const noteKey = wc.champ.note.toLowerCase().replace(/\s+/g, '');
+    champNoteEl.textContent = T(noteKey);
+  }
+
+  // Bind/Update champion vote button click dynamically
+  const champBtn = document.getElementById(`champ-vote-${wc.id}`);
+  if (champBtn) {
+    champBtn.onclick = function() {
+      openModal(wc.champ.name, wc.champ.flag, T(wc.id).toUpperCase() + ' ' + T('champion'), wc.id, 'champ');
+    };
+  }
+
+  const champKey = getP4PKey(wc.champ.name);
+  const champPts = state.scores[champKey] || 0;
+  const champPtsEl = document.getElementById(`champ-pts-${wc.id}`);
+  if (champPtsEl) {
+    champPtsEl.textContent = `${champPts.toLocaleString()} ${T('pts')}`;
+  }
+
+  // Render Rank contenders with individual vote buttons
+  wc.fighters.forEach((f, fIdx) => {
+    const fKey = getP4PKey(f.name);
+    const pts = state.scores[fKey] || 0;
+
+    const row = document.createElement('div');
+    row.className = 'fighter-row';
+    const noteSpan = f.note ? `<span class="tag-note">${T(f.note.toLowerCase().replace(/\s+/g, ''))}</span>` : '';
+    row.innerHTML = `
+      <div class="fr-rank">${f.rank}</div>
+      <div class="fr-info">
+        <div class="fr-name"><span class="flag">${f.flag}</span>${f.name}${noteSpan}</div>
+        <div class="fr-record">${f.record} · ${T(wc.id)} ${T('contender')}</div>
+        <div class="fr-pts" style="font-family:'Share Tech Mono', monospace; font-size:12px; color:var(--gold); margin-top:2px;">
+          ${pts > 0 ? pts.toLocaleString() + ' ' + T('pts') : '0 ' + T('pts')}
+        </div>
+      </div>
+      <div style="margin-left:auto; display:flex; align-items:center; flex-shrink:0; padding-left: 10px;">
+        <button class="btn-vote" id="vote-wc-${wc.id}-${fIdx}" style="padding: 6px 12px; font-size: 13px;">1π</button>
+      </div>
+    `;
+    container.appendChild(row);
+
+    // Bind contender vote button click dynamically with translated weight classes
+    const btn = document.getElementById(`vote-wc-${wc.id}-${fIdx}`);
+    if (btn) {
+      btn.onclick = function() {
+        openModal(f.name, f.flag, T(wc.id).toUpperCase() + ' Rank #' + f.rank, fKey);
+      };
+    }
+  });
+}
+
+/* =========================================================
+   RENDER ALL UI LABELS
+   ========================================================= */
+function renderAll() {
+  renderP4P();
+  WEIGHT_CLASSES.forEach(wc => renderWeightClass(wc));
+  document.getElementById('statVotes').textContent = state.totalVotes.toLocaleString();
+  document.getElementById('statPi').textContent = state.totalPi.toFixed(1) + ' π';
+  
+  // Refresh standard static elements that require i18n
+  document.querySelectorAll('[data-i18n="champion"]').forEach(el => el.textContent = T('champion'));
+  document.querySelectorAll('[data-i18n="settings"]').forEach(el => el.textContent = T('settings'));
+  document.querySelectorAll('[data-i18n="login"]').forEach(el => el.textContent = T('login'));
+  document.querySelectorAll('[data-i18n="pioneerrating"]').forEach(el => el.textContent = T('pioneerrating'));
+}
+
+/* =========================================================
+   BOTTOM NAVIGATION HANDLER
+   ========================================================= */
+function onBottomNavClick(type) {
+  if (type === 'settings') {
+    showToast(`${T('settings')}: ${T('loading').toLowerCase()}`, 'success');
+  } else if (type === 'login') {
+    showToast(`${T('login')}: ${T('loading').toLowerCase()}`, 'success');
+  } else if (type === 'pioneerrating') {
+    showToast(`${T('pioneerrating')}: ${T('loading').toLowerCase()}`, 'success');
+  }
+}
+
+/* =========================================================
+   MMA VIDEOS BUTTON HANDLER
+   ========================================================= */
+function onMmaVideosClick() {
+  showToast("MMA Videos are coming soon!", "success");
+}
+
+/* =========================================================
+   PAGE SELECTION
+   ========================================================= */
+function showPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+  const page = document.getElementById('page-' + id);
+  if (page) page.classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+
+/* =========================================================
+   MODAL SETUP (Backward compatible with all parameters)
+   ========================================================= */
+function openModal(name, flag, division, idx, type) {
+  const scoreKey = getP4PKey(name);
+
+  state.pending = {
+    scoreKey: scoreKey,
+    name, flag, division
+  };
+  
+  document.getElementById('mName').textContent = flag + ' ' + name;
+  document.getElementById('mDiv').textContent = division;
+  
+  // Re-translate pop-up indicators on demand
+  document.querySelector('[data-i18n="voteFor"]').textContent = T('voteFor');
+  document.querySelector('[data-i18n="voteCost"]').textContent = T('voteCost');
+  document.querySelector('[data-i18n="toFighter"]').textContent = T('toFighter');
+  document.querySelector('[data-i18n="walletNote"]').textContent = T('walletNote');
+  document.getElementById('confirmBtn').textContent = T('confirmVote');
+  document.getElementById('voteModal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('voteModal').classList.remove('open');
+  state.pending = null;
+}
+
+// Close popup on backdrop touch
+document.getElementById('voteModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+/* =========================================================
+   PI WALLET CONFIRM VOTE ACTION
+   ========================================================= */
+function confirmVote() {
+  if (!state.pending) return;
+  const { name, scoreKey, division } = state.pending;
+  const btn = document.getElementById('confirmBtn');
+
+  btn.disabled = true;
+  btn.innerHTML = `<span class="spinner"></span>${T('loading')}`;
+
+  executePiPayment(name,
+    // onSuccess
+    () => {
+      state.scores[scoreKey] = (state.scores[scoreKey] || 0) + 100;
+      state.totalVotes++;
+      state.totalPi += 1;
+      
+      saveVoteToServer(scoreKey, name, division, 100, 1);
+      closeModal();
+      renderAll();
+      showToast(`${T('toastSuccess')} ${name} ${T('toastPts')}`, 'success');
+    },
+    // onError
+    () => {
+      showToast(T('toastError'), 'error');
+    },
+    // onFinally
+    () => {
+      btn.disabled = false;
+      btn.textContent = T('confirmVote');
+    }
+  );
+}
+
+function executePiPayment(fighterName, onSuccess, onError, onFinally) {
+  piPay(
+    {
+      amount:   1,
+      memo:     ('P4P Vote: ' + fighterName).substring(0, 60),
+      metadata: { fighter: fighterName, ts: Date.now() }
+    },
+    {
+      onReadyForServerApproval: function(id) {
+        console.log('[Pi SDK] Payment approval request received:', id);
+        fetch('/api/approve', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ paymentId: id })
+        }).catch(function(e) { console.error('[Pi SDK] Approve error:', e); });
+      },
+      onReadyForServerCompletion: function(id, txid) {
+        console.log('[Pi SDK] Payment transaction completed:', txid);
+        fetch('/api/complete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ paymentId: id, txid: txid })
+        })
+        .then(function() { onSuccess(); onFinally(); })
+        .catch(function(e) { console.error('[Pi SDK] Complete record failed:', e); onSuccess(); onFinally(); });
+      },
+      onCancel: function(id)     { console.warn('[Pi SDK] Cancelled paymentId:', id); onError();  onFinally(); },
+      onError:  function(e, pmt) { console.error('[Pi SDK] Payment runtime error:', e);   onError();  onFinally(); }
+    }
+  );
+}
+
+/* =========================================================
+   FLUID ALERTS TOASTS SYSTEM
+   ========================================================= */
+function showToast(msg, type = '') {
+  const zone = document.getElementById('toastZone');
+  const el = document.createElement('div');
+  el.className = `toast${type ? ' ' + type : ''}`;
+  el.textContent = msg;
+  zone.appendChild(el);
+  setTimeout(() => { if (el.parentNode) el.parentNode.removeChild(el); }, 3200);
+}
+
+/* =========================================================
+   MODULE LIFECYCLE INITIALIZER
+   ========================================================= */
+function init() {
+  initDefaultScores();
+  buildWeightPages();
+  buildNavTabs();
+
+  // Load language settings from storage
+  const savedLang = localStorage.getItem('p4p_lang') || 'en';
+  document.getElementById('langSel').value = savedLang;
+  setLang(savedLang);
+
+  // Sync state points from DB
+  loadVotesFromServer();
+
+  // Initialize secure Pi Network SDK hooks
+  initPi();
+}
+
+document.addEventListener('DOMContentLoaded', init);
+console.log('%c P4P FILE VERSION: 12 — COMPACT BUILD ', 'background:#6922D4;color:#fff;font-size:16px;padding:4px 8px;');
+</script>
+</body>
+</html>
