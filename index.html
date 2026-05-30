@@ -236,23 +236,24 @@ h1, h2, h3, .display {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.45);
-  color: #ef4444;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.05) 100%);
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  color: #ff4d4d;
   font-family: 'Share Tech Mono', monospace;
-  font-size: 13px;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 800;
   text-transform: uppercase;
   padding: 8px 16px;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   cursor: pointer;
   transition: all var(--speed) ease;
   letter-spacing: 1.5px;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 .mma-live-btn:hover {
-  background: rgba(239, 68, 68, 0.25);
-  border-color: #ef4444;
-  box-shadow: 0 0 12px rgba(239, 68, 68, 0.35);
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.3) 0%, rgba(239, 68, 68, 0.1) 100%);
+  border-color: #ff3333;
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.1);
   transform: translateY(-1.5px);
 }
 .mma-live-btn:active {
@@ -267,17 +268,328 @@ h1, h2, h3, .display {
 }
 @keyframes live-pulse-dot {
   0% { transform: scale(0.9); opacity: 0.6; }
-  50% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 6px #ef4444; }
+  50% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 8px #ef4444; }
   100% { transform: scale(0.9); opacity: 0.6; }
 }
 
 [data-theme="light"] .mma-live-btn {
-  background: rgba(220, 38, 38, 0.08);
+  background: linear-gradient(135deg, rgba(220, 38, 38, 0.08) 0%, rgba(220, 38, 38, 0.02) 100%);
   border-color: rgba(220, 38, 38, 0.45);
   color: #dc2626;
+  box-shadow: 0 0 10px rgba(220, 38, 38, 0.05);
 }
 [data-theme="light"] .mma-live-pulse {
   background-color: #dc2626;
+}
+
+/* ---- MMA VIDEOS MODAL STYLES ---- */
+.video-modal-box {
+  max-width: 780px !important;
+  width: 95% !important;
+  padding: 24px !important;
+  background: #0d0d17 !important;
+  border: 1px solid rgba(239, 68, 68, 0.3) !important;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.8), 0 0 25px rgba(239,68,68,0.15) !important;
+}
+
+.video-player-container {
+  width: 100%;
+  aspect-ratio: 16/9;
+  background: #000;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  margin-bottom: 12px;
+}
+
+#mainVideoPlayer {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+
+.video-placeholder-overlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(13,13,23,0.85) 0%, rgba(5,5,10,0.98) 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: all var(--speed) ease;
+}
+.video-placeholder-overlay:hover {
+  background: radial-gradient(circle, rgba(13,13,23,0.7) 0%, rgba(5,5,10,0.92) 100%);
+}
+
+.play-icon-glowing {
+  font-size: 40px;
+  color: #ef4444;
+  margin-bottom: 12px;
+  width: 70px;
+  height: 70px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 2px solid #ef4444;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all var(--speed) ease;
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.2);
+  padding-left: 5px;
+}
+.video-placeholder-overlay:hover .play-icon-glowing {
+  transform: scale(1.1);
+  background: rgba(239, 68, 68, 0.25);
+  box-shadow: 0 0 25px rgba(239, 68, 68, 0.5);
+  border-color: #ff5555;
+  color: #ff5555;
+}
+
+.video-info-strip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding-bottom: 12px;
+}
+
+.video-cat-tag {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ff4d4d;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  letter-spacing: 1px;
+}
+
+.video-active-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-h);
+  font-family: 'Barlow', sans-serif;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.video-filter-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
+.video-filter-bar::-webkit-scrollbar {
+  height: 4px;
+}
+.video-filter-bar::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.1);
+  border-radius: var(--radius-sm);
+}
+
+.v-filter-btn {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-muted);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all var(--speed) ease;
+  white-space: nowrap;
+}
+.v-filter-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-h);
+  border-color: rgba(255,255,255,0.2);
+}
+.v-filter-btn.active {
+  background: #ef4444;
+  color: #fff;
+  border-color: #ef4444;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.35);
+}
+
+.videos-grid-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  max-height: 220px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+.videos-grid-list::-webkit-scrollbar {
+  width: 6px;
+}
+.videos-grid-list::-webkit-scrollbar-track {
+  background: rgba(0,0,0,0.2);
+}
+.videos-grid-list::-webkit-scrollbar-thumb {
+  background: rgba(239, 68, 68, 0.3);
+  border-radius: 3px;
+}
+.videos-grid-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(239, 68, 68, 0.5);
+}
+
+.video-card {
+  display: flex;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-md);
+  padding: 8px;
+  cursor: pointer;
+  transition: all var(--speed) ease;
+  align-items: center;
+}
+.video-card:hover {
+  background: rgba(239, 68, 68, 0.04);
+  border-color: rgba(239, 68, 68, 0.25);
+  transform: translateY(-1px);
+}
+.video-card.playing {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: #ef4444;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.15);
+}
+
+.v-card-thumb-container {
+  width: 90px;
+  aspect-ratio: 16/10;
+  position: relative;
+  border-radius: 4px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #000;
+}
+.v-card-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.v-card-duration {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  background: rgba(0,0,0,0.85);
+  color: var(--gold);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 9px;
+  padding: 1px 4px;
+  border-radius: 2px;
+}
+.v-card-hover-play {
+  position: absolute;
+  inset: 0;
+  background: rgba(239, 68, 68, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity var(--speed);
+}
+.video-card:hover .v-card-hover-play {
+  opacity: 1;
+}
+.play-triangle {
+  font-size: 14px;
+  color: #fff;
+  transform: scale(1);
+  transition: transform var(--speed);
+}
+.video-card:hover .play-triangle {
+  transform: scale(1.2);
+}
+
+.v-card-meta {
+  flex-grow: 1;
+  min-width: 0;
+}
+.v-card-tag {
+  font-size: 8px;
+  font-family: 'Share Tech Mono', monospace;
+  color: rgba(239, 68, 68, 0.8);
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+.video-card.playing .v-card-tag {
+  color: #ff3333;
+}
+.v-card-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-h);
+  font-family: 'Barlow', sans-serif;
+  margin-bottom: 3px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.v-card-desc {
+  font-size: 10.5px;
+  color: var(--text-muted);
+  line-height: 1.3;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+[data-theme="light"] .video-modal-box {
+  background: #fbfbfe !important;
+  border-color: rgba(220, 38, 38, 0.3) !important;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.15) !important;
+}
+[data-theme="light"] .v-filter-btn {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+[data-theme="light"] .v-filter-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+[data-theme="light"] .v-filter-btn.active {
+  background: #dc2626;
+  border-color: #dc2626;
+  color: #fff;
+}
+[data-theme="light"] .video-card {
+  background: rgba(0,0,0,0.01);
+  border-color: rgba(0,0,0,0.05);
+}
+[data-theme="light"] .video-card:hover {
+  background: rgba(220, 38, 38, 0.03);
+  border-color: rgba(220, 38, 38, 0.2);
+}
+[data-theme="light"] .video-card.playing {
+  background: rgba(220, 38, 38, 0.06);
+  border-color: #dc2626;
+}
+
+/* Response changes for vertical/mobile styling on video grid */
+@media (max-width: 600px) {
+  .video-modal-box {
+    padding: 16px !important;
+  }
+  .videos-grid-list {
+    grid-template-columns: 1fr;
+    max-height: 160px;
+  }
+  .video-active-title {
+    font-size: 13px;
+  }
 }
 
 .lang-select {
@@ -840,6 +1152,239 @@ h1, h2, h3, .display {
   opacity: 0.6; cursor: not-allowed; transform: none;
 }
 
+/* =========================================================
+   PI AUTH SCREEN CLONE STYLING (MATCHING THE SCREENSHOT)
+   ========================================================= */
+.pi-auth-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #000000;
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  overflow: hidden;
+}
+.pi-auth-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+.pi-browser-header {
+  height: 56px;
+  background: #0d0f14;
+  border-bottom: 1px solid #1f2937;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+.pi-browser-back {
+  color: #ffffff;
+  font-size: 24px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pi-browser-title-area {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pi-browser-logo-wrap {
+  width: 28px;
+  height: 28px;
+  background: #f5c518;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  color: #0b0d14;
+  font-size: 14px;
+  font-family: sans-serif;
+}
+.pi-browser-appname {
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 500;
+}
+.pi-browser-warning {
+  color: #d97706;
+  font-size: 14px;
+  margin-left: 2px;
+}
+.pi-browser-dropdown {
+  color: #ffffff;
+  font-size: 20px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pi-auth-scroll-area {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  background: #080a0f;
+}
+.pi-auth-card {
+  background: #ffffff;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 612px;
+  padding: 44px 36px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+.pi-auth-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: #111827;
+  text-align: center;
+  margin-bottom: 12px;
+  line-height: 1.35;
+  letter-spacing: -0.3px;
+}
+.pi-auth-desc {
+  font-size: 14px;
+  color: #4b5563;
+  text-align: center;
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+.pi-auth-desc strong {
+  font-weight: 700;
+  color: #111827;
+}
+.pi-auth-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 32px 0;
+  align-self: center;
+  max-width: 460px;
+  width: 100%;
+}
+.pi-auth-item {
+  position: relative;
+  font-size: 14px;
+  color: #374151;
+  margin-bottom: 12px;
+  padding-left: 22px;
+  line-height: 1.5;
+}
+.pi-auth-item::before {
+  content: "•";
+  position: absolute;
+  left: 6px;
+  color: #111827;
+  font-weight: 900;
+  font-size: 16px;
+  line-height: 1;
+  top: -1px;
+}
+.pi-auth-item strong {
+  color: #111827;
+  font-weight: bold;
+}
+.pi-auth-btn-allow {
+  background: #6d28d9;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 13px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  width: 100%;
+  margin-bottom: 12px;
+  text-align: center;
+  transition: background 0.15s, transform 0.1s;
+}
+.pi-auth-btn-allow:hover {
+  background: #5b21b6;
+}
+.pi-auth-btn-allow:active {
+  transform: scale(0.99);
+}
+.pi-auth-btn-decline {
+  background: #ffffff;
+  color: #6d28d9;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 13px;
+  border: 1.5px solid #6d28d9;
+  border-radius: 10px;
+  cursor: pointer;
+  width: 100%;
+  text-align: center;
+  transition: background 0.15s, transform 0.1s;
+}
+.pi-auth-btn-decline:hover {
+  background: rgba(109, 40, 217, 0.04);
+}
+.pi-auth-btn-decline:active {
+  transform: scale(0.99);
+}
+
+/* Simulated profile options container, cleanly hidden by default unless expanded */
+.sim-opt-header {
+  font-size: 11px;
+  color: #9ca3af;
+  text-align: center;
+  text-transform: uppercase;
+  margin-top: 24px;
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.sim-opt-header:hover {
+  color: #6d28d9;
+}
+.sim-opt-content {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 16px;
+  margin-top: 10px;
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+}
+.sim-opt-content label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #4b5563;
+  text-transform: uppercase;
+}
+.sim-opt-content input {
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #111827;
+  width: 100%;
+  box-sizing: border-box;
+}
+
 /* Loading spinner inside button */
 .btn-confirm .spinner {
   display: inline-block;
@@ -965,7 +1510,7 @@ h1, h2, h3, .display {
   border-radius: var(--radius-md);
   padding: 6px 8px;
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: repeat(4, 1fr);
   gap: 6px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.4);
   transition: background var(--speed), border var(--speed);
@@ -1016,6 +1561,24 @@ h1, h2, h3, .display {
   color: var(--gold);
   background: rgba(245, 197, 24, 0.08);
 }
+.bottom-nav-btn.video-btn {
+  border-color: rgba(239, 68, 68, 0.2);
+  background: rgba(239, 68, 68, 0.02);
+}
+.bottom-nav-btn.video-btn:hover {
+  border-color: #ef4444;
+  color: #ff4d4d;
+  background: rgba(239, 68, 68, 0.08);
+}
+[data-theme="light"] .bottom-nav-btn.video-btn {
+  border-color: rgba(220, 38, 38, 0.15);
+  background: rgba(220, 38, 38, 0.01);
+}
+[data-theme="light"] .bottom-nav-btn.video-btn:hover {
+  border-color: #dc2626;
+  color: #dc2626;
+  background: rgba(220, 38, 38, 0.06);
+}
 .bottom-nav-btn .btn-emoji {
   font-size: 13px;
   width: 22px;
@@ -1042,6 +1605,11 @@ h1, h2, h3, .display {
   background: rgba(245, 197, 24, 0.15);
   border-color: var(--gold);
   box-shadow: 0 0 8px rgba(245, 197, 24, 0.3);
+}
+.bottom-nav-btn.video-btn:hover .btn-emoji {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: #ef4444;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.3);
 }
 .bottom-nav-btn .btn-lbl {
   font-size: 10px;
@@ -1085,10 +1653,6 @@ h1, h2, h3, .display {
           </select>
           <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" aria-label="Toggle theme" title="Toggle dark/light mode"></button>
         </div>
-        <button class="mma-live-btn" onclick="onMmaVideosClick()">
-          <span class="mma-live-pulse"></span>
-          <span>MMA VIDEOS</span>
-        </button>
       </div>
     </div>
     <div class="header-stats">
@@ -1180,7 +1744,11 @@ h1, h2, h3, .display {
     <span class="btn-emoji">⚙️</span>
     <span class="btn-lbl" data-i18n="settings">Settings</span>
   </button>
-  <button class="bottom-nav-btn center-btn" onclick="onBottomNavClick('login')">
+  <button class="bottom-nav-btn video-btn" onclick="onMmaVideosClick()">
+    <span class="btn-emoji">🎥</span>
+    <span class="btn-lbl" data-i18n="mmavideostab">MMA Videos</span>
+  </button>
+  <button class="bottom-nav-btn center-btn" id="loginNavBtn" onclick="onBottomNavClick('login')">
     <span class="btn-emoji">👤</span>
     <span class="btn-lbl" data-i18n="login">Login</span>
   </button>
@@ -1246,6 +1814,137 @@ h1, h2, h3, .display {
 </div>
 
 <!-- ============================
+     MMA VIDEOS MODAL
+     ============================ -->
+<div class="modal-overlay" id="mmaVideosModal" role="dialog" aria-modal="true">
+  <div class="modal-box video-modal-box" style="text-align: center; max-width: 480px !important;">
+    <button class="modal-close" onclick="closeMmaVideos()" aria-label="Close">✕</button>
+    <div style="font-family: 'Barlow Condensed', sans-serif; font-size: 26px; font-weight: 900; color: #ef4444; letter-spacing: 1.5px; margin-bottom: 12px; border-bottom: 2px solid rgba(239, 68, 68, 0.2); padding-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 10px;">
+      <span class="mma-live-pulse" style="width: 10px; height: 10px;"></span>
+      <span data-i18n="mmavideostitle">MMA VIDEOS</span>
+    </div>
+    <div style="padding: 40px 20px; display: flex; flex-direction: column; align-items: center; gap: 16px;">
+      <div style="font-size: 48px; filter: drop-shadow(0 0 10px rgba(239,68,68,0.4));">🎥</div>
+      <p style="font-family: 'Share Tech Mono', monospace; font-size: 14px; color: var(--text-h); text-transform: uppercase; letter-spacing: 1px;" data-i18n="videoscomingsoon">
+        MMA Videos & Highlights section is coming soon!
+      </p>
+      <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5; max-width: 320px;" data-i18n="videoscomingsoondesc">
+        We are preparing the best fights, knockouts, and promo videos. Stay tuned!
+      </p>
+    </div>
+    <button class="btn-confirm" onclick="closeMmaVideos()" style="width: 100%;" data-i18n="btnClose">CLOSE</button>
+  </div>
+</div>
+
+<!-- ============================
+     REGISTER / LOGIN AUTH MODAL (Pi Browser Auth Clone)
+     ============================ -->
+<div class="pi-auth-overlay" id="authModal">
+  <!-- Mimic Pi Browser top bar exactly as shown in screenshot -->
+  <div class="pi-browser-header">
+    <button class="pi-browser-back" onclick="closeAuthModal()" title="Back">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+    </button>
+    
+    <div class="pi-browser-title-area">
+      <div class="pi-browser-logo-wrap">π</div>
+      <span class="pi-browser-appname">Thepitogo Services</span>
+      <span class="pi-browser-warning" title="Developer Sandboxed">⚠️</span>
+    </div>
+    
+    <button class="pi-browser-dropdown" onclick="toggleSimOpts()" title="Browser Menu">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+    </button>
+  </div>
+
+  <!-- Main scrollable authentication frame -->
+  <div class="pi-auth-scroll-area">
+    <div class="pi-auth-card">
+      <h1 class="pi-auth-title" data-i18n="piAuthTitle">Share information with Thepitogo Services?</h1>
+      
+      <p class="pi-auth-desc">
+        <span class="app-brand-name" style="font-weight: bold;">Thepitogo Services</span> is requesting the following data or permissions:
+      </p>
+
+      <ul class="pi-auth-list">
+        <li class="pi-auth-item">
+          <strong>Auth</strong>: <span data-i18n="piAuthBullet1">Authenticate you on this app with your Pi account</span>
+        </li>
+        <li class="pi-auth-item">
+          <strong>Username</strong>: <span data-i18n="piAuthBullet2">Your Pi username</span>
+        </li>
+        <li class="pi-auth-item">
+          <strong>Wallet address</strong>: <span data-i18n="piAuthBullet3">Your wallet address</span>
+        </li>
+      </ul>
+
+      <!-- Primary Action Buttons mimicking the screenshot color & shape and sizing -->
+      <button class="pi-auth-btn-allow" onclick="triggerPioneerAllowAuth()" id="piAllowBtn" data-i18n="piAuthAllow">
+        Allow
+      </button>
+      
+      <button class="pi-auth-btn-decline" onclick="closeAuthModal()" data-i18n="piAuthDecline">
+        Decline
+      </button>
+
+      <!-- Advanced simulation developer options block -->
+      <div class="sim-opt-header" id="simOptTriggerIcon" onclick="toggleSimOpts()">
+        ⚙️ Simulated Verification Profiles (Click to adjust mock details)
+      </div>
+      <div class="sim-opt-content" id="simOpts">
+        <div style="font-size: 12px; color: #6b7280; font-style: italic; line-height: 1.4; margin-bottom: 6px;">
+          * Pi Developer Mode is active outside Pi Browser. You can customize simulated credentials to test persistence.
+        </div>
+        <div>
+          <label>Pi Username:</label>
+          <input type="text" id="authUsernameInput" placeholder="@username" value="">
+        </div>
+        <div>
+          <label>Wallet Address:</label>
+          <input type="text" id="authWalletInput" placeholder="Alpha-Numeric (starts with G)" value="">
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ============================
+     PIONEERS LEADERBOARD / REGISTERED USERS MODAL
+     ============================ -->
+<div class="modal-overlay" id="pioneerModal" role="dialog" aria-modal="true">
+  <div class="modal-box" style="max-width: 580px; text-align: left; padding: 26px 22px;">
+    <button class="modal-close" onclick="closePioneerModal()" aria-label="Close">✕</button>
+    <div style="font-family: 'Barlow Condensed', sans-serif; font-size: 26px; font-weight: 800; color: var(--gold); letter-spacing: 1px; margin-bottom: 12px; border-bottom: 2px solid rgba(245, 197, 24, 0.2); padding-bottom: 8px; display: flex; align-items: center; justify-content: space-between;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span>🏆</span>
+        <span data-i18n="pioneerLeaderboardTitle">PIONEERS DATABASE</span>
+      </div>
+    </div>
+    
+    <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 16px;" data-i18n="pioneerDesc">
+      The authoritative public registry of registered MMA P4P voters on the Pi Network.
+    </p>
+
+    <div style="overflow-x: auto; max-height: 380px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+      <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13px;">
+        <thead>
+          <tr style="background: rgba(255, 255, 255, 0.03); border-bottom: 1px solid var(--border);">
+            <th style="padding: 10px 12px; font-family: 'Share Tech Mono', monospace; font-size: 11px; color: var(--text-muted); text-transform: uppercase;">#</th>
+            <th style="padding: 10px 12px; font-family: 'Share Tech Mono', monospace; font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Pioneer</th>
+            <th style="padding: 10px 12px; font-family: 'Share Tech Mono', monospace; font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Wallet Address</th>
+            <th style="padding: 10px 12px; font-family: 'Share Tech Mono', monospace; font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Joined At</th>
+          </tr>
+        </thead>
+        <tbody id="pioneersTableBody">
+          <!-- Dynamically loaded with js -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ============================
      JAVASCRIPT
      ============================ -->
 <script>
@@ -1266,6 +1965,31 @@ const LANG = {
     pts: "pts", loading: "PROCESSING…",
     disclaimer: "This app is a fan project and is not affiliated with, endorsed, or sponsored by any professional sports organization.",
     p4pOfficialRank: "Official rank",
+    mmavideostitle: "MMA VIDEOS",
+    mmavideostab: "MMA Videos",
+    videoscomingsoon: "MMA Videos & Highlights section is coming soon!",
+    videoscomingsoondesc: "We are preparing the best fights, knockouts, and promo videos. Stay tuned!",
+    btnClose: "CLOSE",
+    loginTitle: "PIONEER REGISTRATION",
+    loginDesc: "Log in or register with your Pi Wallet to track your votes and see your ranking on our Pioneer Leaderboard.",
+    loginAutoBtn: "AUTO-CONNECT VIA PI SDK",
+    loginManualTitle: "OR MANUAL REGISTRATION",
+    loginUsernameLabel: "Pi Username (e.g. @pioneer):",
+    loginWalletLabel: "Pi Wallet Address (G...):",
+    loginSubmitBtn: "REGISTER / LOGIN WITH WALLET",
+    loginSuccessToast: "Logged in successfully as",
+    loginErrorEmpty: "Please enter your Pi Username",
+    btnRegister: "REGISTER NOW",
+    statusConnected: "Connected via Pi SDK",
+    statusNotConnected: "Not connected",
+    pioneerLeaderboardTitle: "PIONEERS DATABASE",
+    pioneerDesc: "The authoritative public registry of registered MMA P4P voters on the Pi Network.",
+    piAuthTitle: "Share information with Thepitogo Services?",
+    piAuthBullet1: "Authenticate you on this app with your Pi account",
+    piAuthBullet2: "Your Pi username",
+    piAuthBullet3: "Your wallet address",
+    piAuthAllow: "Allow",
+    piAuthDecline: "Decline",
   },
   ru: {
     subtitle: "Фунт за Фунт · Фанатский Рейтинг",
@@ -1280,6 +2004,31 @@ const LANG = {
     pts: "очк", loading: "ОБРАБОТКА…",
     disclaimer: "Это фанатский проект, не связанный и не аффилированный ни с одной профессиональной спортивной организацией.",
     p4pOfficialRank: "Официальный ранг",
+    mmavideostitle: "MMA ВИДЕО",
+    mmavideostab: "MMA Видео",
+    videoscomingsoon: "Раздел MMA Видео скоро появится!",
+    videoscomingsoondesc: "Мы готовим для вас лучшие бои, нокауты и промо-ролики. Следите за обновлениями!",
+    btnClose: "ЗАКРЫТЬ",
+    loginTitle: "РЕГИСТРАЦИЯ ПИОНЕРА",
+    loginDesc: "Войдите или зарегистрируйтесь с вашим Pi кошельком, чтобы отслеживать свои голоса и видеть себя в таблице лидеров Пионеров.",
+    loginAutoBtn: "АВТОПОДКЛЮЧЕНИЕ ЧЕРЕЗ PI SDK",
+    loginManualTitle: "ИЛИ РУЧНАЯ РЕГИСТРАЦИЯ",
+    loginUsernameLabel: "Имя (Pi Username, например @pioneer):",
+    loginWalletLabel: "Адрес кошелька Pi (G...):",
+    loginSubmitBtn: "ЗАРЕГИСТРИРОВАТЬСЯ / ВОЙТИ",
+    loginSuccessToast: "Успешный вход под именем",
+    loginErrorEmpty: "Пожалуйста, введите ваше имя пользователя Pi",
+    btnRegister: "ЗАРЕГИСТРИРОВАТЬСЯ",
+    statusConnected: "Подключено через Pi SDK",
+    statusNotConnected: "Не подключено",
+    pioneerLeaderboardTitle: "БАЗА ДАННЫХ ПИОНЕРОВ",
+    pioneerDesc: "Официальный публичный реестр зарегистрированных избирателей MMA P4P в сети Pi Network.",
+    piAuthTitle: "Поделиться информацией с Thepitogo Services?",
+    piAuthBullet1: "Авторизовать вас в этом приложении с помощью учетной записи Pi",
+    piAuthBullet2: "Ваше имя пользователя Pi",
+    piAuthBullet3: "Ваш адрес кошелька Pi",
+    piAuthAllow: "Разрешить",
+    piAuthDecline: "Отклонить",
   },
   ar: {
     subtitle: "باوند فور باوند · تصنيف المشجعين",
@@ -1744,6 +2493,8 @@ const state = {
   totalPi: 0,
   pending: null,       // { scoreKey, name, flag, division }
   piReady: false,
+  currentUser: null,
+  lastAuthenticatedPiUser: null,
 };
 
 /* ---- Pre-populate starting values locally to avoid empty scoreboard ---- */
@@ -1770,19 +2521,21 @@ function initDefaultScores() {
    ========================================================= */
 var API_BASE = '/api';
 
-/* ---- Load globally persisted scores from Replit ---- */
+/* ---- Load globally persisted scores from DB ---- */
 function loadVotesFromServer() {
-  fetch(API_BASE + '/votes')
+  fetch(API_BASE + '/get-votes')
     .then(function(r) { return r.json(); })
     .then(function(data) {
-      if (data && Array.isArray(data.votes)) {
-        data.votes.forEach(function(v) {
+      if (data) {
+        var votesList = Array.isArray(data) ? data : (Array.isArray(data.votes) ? data.votes : []);
+        
+        votesList.forEach(function(v) {
           state.scores[v.fighter_key] = Math.round((Number(v.points) || 0) / 100) * 100;
         });
         
         // Recalculate totals
-        let votesCount = 0;
-        let piCount = 0;
+        var votesCount = 0;
+        var piCount = 0;
         Object.keys(state.scores).forEach(function(k) {
           votesCount += Math.floor(state.scores[k] / 100);
           piCount += state.scores[k] / 100;
@@ -1792,7 +2545,7 @@ function loadVotesFromServer() {
         state.totalPi = piCount;
         
         renderAll();
-        console.log('[DB] Loaded', data.votes.length, 'fighters from backend');
+        console.log('[DB] Loaded', votesList.length, 'fighters from persistent database');
       }
     })
     .catch(function(e) { console.warn('[DB] Could not load votes from server:', e.message); });
@@ -1847,6 +2600,12 @@ function initPi() {
     _authReady   = true;
     _hasPayments = !!(auth && auth.accessToken);
     state.piReady = true;
+    if (auth && auth.user) {
+      state.lastAuthenticatedPiUser = auth.user;
+      console.log('[Pi SDK] Auto-detected Pioneer user:', auth.user.username);
+      // Try to register seamlessly without flashing alerts on start
+      registerUserOnBackend(auth.user.username, '', false);
+    }
     console.log('[Pi] Success authenticating. Payments support unlocked: ', _hasPayments);
   })
   .catch(function(err) {
@@ -2094,17 +2853,269 @@ function onBottomNavClick(type) {
   if (type === 'settings') {
     showToast(`${T('settings')}: ${T('loading').toLowerCase()}`, 'success');
   } else if (type === 'login') {
-    showToast(`${T('login')}: ${T('loading').toLowerCase()}`, 'success');
+    openAuthModal();
   } else if (type === 'pioneerrating') {
-    showToast(`${T('pioneerrating')}: ${T('loading').toLowerCase()}`, 'success');
+    openPioneerModal();
   }
 }
 
 /* =========================================================
-   MMA VIDEOS BUTTON HANDLER
+   AUTHENTICATION & REGISTRATION MODAL LOGIC (Pi Wallet-driven)
+   ========================================================= */
+function openAuthModal() {
+  const modal = document.getElementById('authModal');
+  if (modal) {
+    modal.classList.add('open');
+    
+    // Auto-generate high-quality simulated credentials if not already customized
+    const uInput = document.getElementById('authUsernameInput');
+    const wInput = document.getElementById('authWalletInput');
+    
+    if (uInput && !uInput.value) {
+      const prefixes = ['mma_champion', 'pioneer_voter', 'ringside_fan', 'fight_analyst', 'p4p_voter', 'ufc_expert', 'pioneer_fan'];
+      const randomSfx = Math.floor(100 + Math.random() * 900);
+      uInput.value = '@' + prefixes[Math.floor(Math.random() * prefixes.length)] + randomSfx;
+    }
+    
+    if (wInput && !wInput.value) {
+      // Standard stellar public-key format style
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+      let mockAddr = 'G';
+      for (let i = 0; i < 55; i++) {
+        mockAddr += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      wInput.value = mockAddr;
+    }
+  }
+}
+
+function closeAuthModal() {
+  const modal = document.getElementById('authModal');
+  if (modal) {
+    modal.classList.remove('open');
+  }
+}
+
+function toggleSimOpts() {
+  const simDiv = document.getElementById('simOpts');
+  if (simDiv) {
+    const isShowing = simDiv.style.display === 'flex';
+    simDiv.style.display = isShowing ? 'none' : 'flex';
+  }
+}
+
+function triggerPioneerAllowAuth() {
+  if (typeof Pi !== 'undefined') {
+    // Inside real Pi Browser Sandbox (step 10 developer checklist compliance)
+    Pi.authenticate(['username', 'payments'], function(pmt) {
+      console.log('[Pi SDK] Incomplete payment verify:', pmt);
+    })
+    .then(function(auth) {
+      _authReady = true;
+      if (auth && auth.user) {
+        state.lastAuthenticatedPiUser = auth.user;
+        const customWallet = document.getElementById('authWalletInput').value.trim();
+        registerUserOnBackend(auth.user.username, customWallet || '', true);
+      } else {
+        showToast('Pi authentication returned empty payload', 'error');
+      }
+    })
+    .catch(function(err) {
+      console.warn('[Pi SDK] Authentication declined or failed. Preserving preview sandbox flow.', err);
+      // Fallback seamlessly so users can test perfectly in any browser
+      proceedWithSimulatedAuth();
+    });
+  } else {
+    // Normal browser / preview simulation mode
+    proceedWithSimulatedAuth();
+  }
+}
+
+function proceedWithSimulatedAuth() {
+  const username = document.getElementById('authUsernameInput').value.trim();
+  const wallet = document.getElementById('authWalletInput').value.trim();
+  
+  if (!username) {
+    showToast(T('loginErrorEmpty') || 'Please enter a Pi username', 'error');
+    // expand choices so user sees options
+    const simDiv = document.getElementById('simOpts');
+    if (simDiv) simDiv.style.display = 'flex';
+    return;
+  }
+  
+  registerUserOnBackend(username, wallet, true);
+}
+
+function registerUserOnBackend(username, walletAddress, showAlert) {
+  fetch('/api/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username: username, walletAddress: walletAddress })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    if (data && data.success) {
+      state.currentUser = data.user;
+      localStorage.setItem('p4p_user', JSON.stringify(data.user));
+      updateLoginButtonUI();
+      closeAuthModal();
+      
+      if (showAlert) {
+        showToast(T('loginSuccessToast') + ': ' + data.user.username, 'success');
+      }
+    } else {
+      if (showAlert) {
+        showToast('Registration issue: ' + (data.error || 'Server error'), 'error');
+      }
+    }
+  })
+  .catch(function(err) {
+    console.error('[Auth Service] Database persistence error:', err);
+    if (showAlert) {
+      showToast('Offline fallback: Registered locally.', 'success');
+      // Save locally to keep UX smooth if server connection drops
+      const fallbackUser = { username: username, walletAddress: walletAddress || 'Local Address', registeredAt: new Date().toISOString() };
+      state.currentUser = fallbackUser;
+      localStorage.setItem('p4p_user', JSON.stringify(fallbackUser));
+      updateLoginButtonUI();
+      closeAuthModal();
+    }
+  });
+}
+
+function updateLoginButtonUI() {
+  const btn = document.getElementById('loginNavBtn');
+  if (!btn) return;
+  
+  if (state.currentUser) {
+    btn.classList.add('logged-in');
+    let display = state.currentUser.username;
+    if (display.length > 9) display = display.substring(0, 7) + '..';
+    btn.innerHTML = `
+      <span class="btn-emoji" style="position: relative; display: inline-flex; align-items: center; justify-content: center;">
+        👤
+        <span style="position: absolute; bottom: -1px; right: -1px; width: 8px; height: 8px; background: #10b981; border-radius: 50%; border: 1.5px solid rgba(0,0,0,0.8);"></span>
+      </span>
+      <span class="btn-lbl" style="color: #34d399; font-weight: 700;">${display}</span>
+    `;
+  } else {
+    btn.classList.remove('logged-in');
+    btn.innerHTML = `
+      <span class="btn-emoji">👤</span>
+      <span class="btn-lbl" data-i18n="login">${T('login')}</span>
+    `;
+  }
+}
+
+/* =========================================================
+   PIONEERS LEADERBOARD & DIRECTORY INTERACTION
+   ========================================================= */
+function openPioneerModal() {
+  const modal = document.getElementById('pioneerModal');
+  if (modal) {
+    modal.classList.add('open');
+    loadPioneersList();
+  }
+}
+
+function closePioneerModal() {
+  const modal = document.getElementById('pioneerModal');
+  if (modal) {
+    modal.classList.remove('open');
+  }
+}
+
+function loadPioneersList() {
+  const tbody = document.getElementById('pioneersTableBody');
+  if (!tbody) return;
+  
+  tbody.innerHTML = `
+    <tr>
+      <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 30px;">
+        <span style="display:inline-block; margin-right: 8px;">🔄</span>
+         Loading Pioneers...
+      </td>
+    </tr>
+  `;
+  
+  fetch('/api/users')
+  .then(function(r) { return r.json(); })
+  .then(function(users) {
+    if (Array.isArray(users)) {
+      if (users.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 30px;" data-i18n="pioneerEmptyList">
+              ${T('pioneerEmptyList')}
+            </td>
+          </tr>
+        `;
+        return;
+      }
+      
+      let html = '';
+      users.forEach((u, i) => {
+        const dateStr = u.registeredAt ? new Date(u.registeredAt).toLocaleDateString(curLang === 'ru' ? 'ru' : 'en') : '—';
+        const displayAddress = u.walletAddress && u.walletAddress !== 'Simulated Wallet Address' 
+          ? u.walletAddress.substring(0, 6) + '...' + u.walletAddress.substring(u.walletAddress.length - 6)
+          : 'Simulated Wallet';
+        
+        let rankClass = '';
+        if (i === 0) rankClass = 'color: var(--gold); font-weight: bold;';
+        else if (i === 1) rankClass = 'color: #94a3b8; font-weight: bold;';
+        else if (i === 2) rankClass = 'color: #b45309; font-weight: bold;';
+        
+        html += `
+          <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05); transition: background 0.2s hover;">
+            <td style="padding: 12px; font-family: 'Share Tech Mono', monospace; ${rankClass}">${i + 1}</td>
+            <td style="padding: 12px; font-family: 'Barlow', sans-serif; font-weight: bold; color: var(--text-h);">${u.username}</td>
+            <td style="padding: 12px; font-family: 'JetBrains Mono', monospace; color: var(--text-muted); font-size: 11px;">${displayAddress}</td>
+            <td style="padding: 12px; font-family: 'Share Tech Mono', monospace; color: var(--text-muted);">${dateStr}</td>
+          </tr>
+        `;
+      });
+      tbody.innerHTML = html;
+    } else {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="4" style="text-align: center; color: #f87171; padding: 30px;" data-i18n="pioneerListLoadError">
+            ${T('pioneerListLoadError')}
+          </td>
+        </tr>
+      `;
+    }
+  })
+  .catch(function(err) {
+    console.error('[Pioneer List View]', err);
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="4" style="text-align: center; color: #f87171; padding: 30px;">
+          Error connecting to server.
+        </td>
+      </tr>
+    `;
+  });
+}
+
+/* =========================================================
+   MMA VIDEOS INTEGRATION
    ========================================================= */
 function onMmaVideosClick() {
-  showToast("MMA Videos are coming soon!", "success");
+  openMmaVideos();
+}
+
+function openMmaVideos() {
+  const modal = document.getElementById("mmaVideosModal");
+  if (modal) {
+    modal.classList.add("open");
+  }
+}
+
+function closeMmaVideos() {
+  const modal = document.getElementById("mmaVideosModal");
+  if (modal) {
+    modal.classList.remove("open");
+  }
 }
 
 /* =========================================================
@@ -2181,6 +3192,12 @@ document.addEventListener('DOMContentLoaded', function() {
       if (e.target === this) closePrivacy();
     });
   }
+  const mmaVideosOverlay = document.getElementById('mmaVideosModal');
+  if (mmaVideosOverlay) {
+    mmaVideosOverlay.addEventListener('click', function(e) {
+      if (e.target === this) closeMmaVideos();
+    });
+  }
 });
 
 /* =========================================================
@@ -2243,6 +3260,7 @@ function executePiPayment(fighterName, scoreKey, division, onSuccess, onError, o
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             paymentId: id,
+            txid: txid,
             fighterId: scoreKey,
             fighterName: fighterName,
             division: division
@@ -2298,6 +3316,17 @@ function init() {
   const savedLang = localStorage.getItem('p4p_lang') || 'en';
   document.getElementById('langSel').value = savedLang;
   setLang(savedLang);
+
+  // Load saved user from local storage
+  const savedUser = localStorage.getItem('p4p_user');
+  if (savedUser) {
+    try {
+      state.currentUser = JSON.parse(savedUser);
+      updateLoginButtonUI();
+    } catch(e) {
+      console.warn('Could not parse saved user:', e);
+    }
+  }
 
   // Sync state points from DB
   loadVotesFromServer();
