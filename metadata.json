@@ -1,6 +1,6 @@
 {
-  "name": "P4P Fan MMA Rankings",
-  "description": "Fan-driven Pound-for-Pound MMA rankings based on Pi Network votes.",
+  "name": "P4P Fan Rankings",
+  "description": "Fan-driven Pound-for-Pound MMA rankings app on Pi Network. Cast secure voice votes with 1 Pi.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

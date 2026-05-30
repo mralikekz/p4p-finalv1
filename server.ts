@@ -5,34 +5,15 @@ import { createServer as createViteServer } from "vite";
 
 const app = express();
 const PORT = 3000;
-const DB_FILE = path.join(process.cwd(), "votes.json");
+const dbPath = path.join(process.cwd(), "db.json");
 
-// Helper to safely load database
-async function readDB() {
-  try {
-    const data = await fs.readFile(DB_FILE, "utf-8");
-    return JSON.parse(data);
-  } catch (error) {
-    return { votes: [] };
-  }
-}
-
-// Helper to safely write database
-async function writeDB(data: any) {
-  try {
-    await fs.writeFile(DB_FILE, JSON.stringify(data, null, 2), "utf-8");
-  } catch (error) {
-    console.error("Failed to write database file:", error);
-  }
-}
-
-app.use(express.json());
-
-// In-memory Rate Limit state tracker
+// Define custom types
 interface RateLimitEntry {
   count: number;
   resetTime: number;
 }
+
+// In-memory rate limiting tracker
 const rateLimits = new Map<string, RateLimitEntry>();
 
 function checkRateLimit(ip: string): boolean {
@@ -52,77 +33,104 @@ function checkRateLimit(ip: string): boolean {
   return true;
 }
 
+// DB helper functions
+async function readDB() {
+  try {
+    const data = await fs.readFile(dbPath, "utf-8");
+    return JSON.parse(data);
+  } catch (e) {
+    return { votes: [] };
+  }
+}
+
+async function writeDB(data: any) {
+  await fs.writeFile(dbPath, JSON.stringify(data, null, 2), "utf-8");
+}
+
+app.use(express.json());
+
+// Main official wallet address and API key from environment
+const DEVELOPER_WALLET_ADDRESS = process.env.DEVELOPER_WALLET_ADDRESS || "GBHVTAJ7543JH4YE3NMKJQQKGIIN2EDEY2JAWP2H653RPL37VDBFPPLO";
+const PI_API_KEY = process.env.PI_API_KEY || "";
+
+// Serve the Pi validation-key.txt at the root
+app.get("/validation-key.txt", async (req, res) => {
+  try {
+    const keyPath = path.join(process.cwd(), "validation-key.txt");
+    res.sendFile(keyPath);
+  } catch (err: any) {
+    res.status(404).send("File not found");
+  }
+});
+
 // API endpoints
 app.get("/api/votes", async (req, res) => {
   const dbData = await readDB();
-  res.json(dbData);
+  res.json(dbData.votes || []);
 });
 
-// Disable direct, unverified vote additions to prevent security bypasses
+// Disable direct, unverified votes updates
 app.post("/api/votes", (req, res) => {
-  res.status(403).json({ 
-    error: "Direct vote updates are strictly prohibited. All votes must be validated through /api/verify-payment" 
+  res.status(403).json({
+    error: "Direct vote updates are prohibited. All votes must be validated through /api/verify-payment."
   });
 });
 
-// Secure endpoint for verifying payments in Node.js serverless architecture style
+// Secure endpoint for verifying payments
 app.post("/api/verify-payment", async (req, res) => {
   const { paymentId, fighterId, fighterName, division } = req.body;
-  
+
   if (!paymentId || !fighterId) {
-    res.status(400).json({ error: "paymentId and fighterId are required" });
+    res.status(400).json({ error: "paymentId and fighterId are required fields" });
     return;
   }
 
-  // Apply rate limiting checking to avoid brute force or DDOS of paymentIds
-  const ip = (req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown').toString();
+  // Rate Limiting by IP client
+  const ip = (req.headers["x-forwarded-for"] || req.socket.remoteAddress || "unknown").toString();
   if (!checkRateLimit(ip)) {
     res.status(429).json({ error: "Too many payment verification requests. Limit is 3 requests per minute." });
     return;
   }
 
-  const piApiKey = process.env.PI_API_KEY;
-  const officialWallet = process.env.DEVELOPER_WALLET_ADDRESS || "GCXCW4REFA6PMYKOOI5N7F53P4HJR2SETBIOVTVH3ZAFFG35G47OMTWG";
-
   let isPaymentValid = false;
   let validationError = "Verification failed";
 
-  // If in sandbox mode, or sandbox payment ID is used, safely emulate success
-  if (!piApiKey || paymentId.startsWith("demo_") || paymentId.includes("sandbox")) {
+  // If in sandbox mode or starting with demo_, simulate success
+  if (!PI_API_KEY || paymentId.startsWith("demo_") || paymentId.includes("sandbox")) {
     console.log(`[Pi Sandbox Verification] Developer mode emulation for payment: ${paymentId}`);
     isPaymentValid = true;
   } else {
     try {
-      // Secure sever-side network call to official Pi blockchain API
+      // Secure server-side request to Pi Network API
       const response = await fetch(`https://api.minepi.com/v2/payments/${paymentId}`, {
         headers: {
-          "Authorization": `Key ${piApiKey}`
+          "Authorization": `Key ${PI_API_KEY}`
         }
       });
 
       if (!response.ok) {
-        throw new Error(`Pi network API responded with HTTP ${response.status}`);
+        throw new Error(`Pi APIs responded with HTTP status ${response.status}`);
       }
 
       const pmtData: any = await response.json();
 
-      // Check Criteria (a): transaction state must be strictly equal to completed
+      // Criteria (a): Transaction state completed
       const isCompleted = pmtData.status === "completed" || 
                           (pmtData.status && pmtData.status.developer_completed === true) || 
                           pmtData.state === "completed";
 
-      // Check Criteria (b): transaction cost must be exactly 1.0 Pi
+      // Criteria (b): Exact size is 1.0 Pi
       const isAmountValid = pmtData.amount !== undefined && Number(pmtData.amount) === 1.0;
 
-      // Check Criteria (c): beneficiary wallet address must match ours
-      const isRecipientValid = pmtData.recipient && pmtData.recipient.toLowerCase() === officialWallet.toLowerCase();
+      // Criteria (c): Destination is official wallet
+      const isRecipientValid = pmtData.recipient && pmtData.recipient.toLowerCase() === DEVELOPER_WALLET_ADDRESS.toLowerCase();
 
       if (!isCompleted) {
-        validationError = "Pi Network transaction is not completed";
+        validationError = "Pi Network transaction is not yet completed on blockchain";
       } else if (!isAmountValid) {
         validationError = `Transaction amount mismatch: expected 1.0, got ${pmtData.amount}`;
       } else if (!isRecipientValid) {
-        validationError = `Destination wallet error: mismatch with developer official address`;
+        validationError = `Recipient wallet mismatch: expected ${DEVELOPER_WALLET_ADDRESS}, got ${pmtData.recipient}`;
       } else {
         isPaymentValid = true;
       }
@@ -137,7 +145,7 @@ app.post("/api/verify-payment", async (req, res) => {
     return;
   }
 
-  // Increment and persist the vote inside DB
+  // Add the verified vote and increment by 100 points
   const dbData = await readDB();
   if (!dbData.votes) {
     dbData.votes = [];
@@ -148,7 +156,7 @@ app.post("/api/verify-payment", async (req, res) => {
     entry = {
       fighter_key: fighterId,
       fighter_name: fighterName || fighterId,
-      division: division || "Unknown",
+      division: division || "Unknown Class",
       points: 0,
       pi_amount: 0
     };
@@ -162,16 +170,16 @@ app.post("/api/verify-payment", async (req, res) => {
   res.status(200).json({ success: true, entry });
 });
 
+// Approve integration
 app.post("/api/approve", async (req, res) => {
   const { paymentId } = req.body;
-  const piApiKey = process.env.PI_API_KEY;
 
   if (!paymentId) {
     res.status(400).json({ error: "paymentId is required" });
     return;
   }
 
-  if (!piApiKey || paymentId.startsWith("demo_")) {
+  if (!PI_API_KEY || paymentId.startsWith("demo_")) {
     console.log(`[Pi Sandbox] Approving simulated payment: ${paymentId}`);
     res.json({ approved: true });
     return;
@@ -181,7 +189,7 @@ app.post("/api/approve", async (req, res) => {
     const response = await fetch(`https://api.minepi.com/v2/payments/${paymentId}/approve`, {
       method: "POST",
       headers: {
-        "Authorization": `Key ${piApiKey}`,
+        "Authorization": `Key ${PI_API_KEY}`,
         "Content-Type": "application/json"
       }
     });
@@ -197,16 +205,16 @@ app.post("/api/approve", async (req, res) => {
   }
 });
 
+// Finalize complete integration
 app.post("/api/complete", async (req, res) => {
   const { paymentId, txid } = req.body;
-  const piApiKey = process.env.PI_API_KEY;
 
   if (!paymentId) {
     res.status(400).json({ error: "paymentId is required" });
     return;
   }
 
-  if (!piApiKey || paymentId.startsWith("demo_")) {
+  if (!PI_API_KEY || paymentId.startsWith("demo_")) {
     console.log(`[Pi Sandbox] Finalizing simulated payment: ${paymentId}`);
     res.json({ completed: true });
     return;
@@ -216,7 +224,7 @@ app.post("/api/complete", async (req, res) => {
     const response = await fetch(`https://api.minepi.com/v2/payments/${paymentId}/complete`, {
       method: "POST",
       headers: {
-        "Authorization": `Key ${piApiKey}`,
+        "Authorization": `Key ${PI_API_KEY}`,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({ txid })
@@ -234,7 +242,6 @@ app.post("/api/complete", async (req, res) => {
 });
 
 async function startServer() {
-  // Vite integration
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
       server: { middlewareMode: true },
@@ -250,7 +257,7 @@ async function startServer() {
   }
 
   app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running on port ${PORT}`);
+    console.log(`Server running on http://localhost:${PORT}`);
   });
 }
 
