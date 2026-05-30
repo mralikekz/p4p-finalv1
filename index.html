@@ -1197,8 +1197,53 @@ h1, h2, h3, .display {
   <p class="footer-disclaimer" data-i18n="disclaimer">
     This app is a fan project and is not affiliated with, endorsed, or sponsored by any professional sports organization.
   </p>
-  <p class="footer-brand">P4P Fan Rankings · Pi Network · 2026</p>
+  <div style="font-size: 11px; color: var(--text-muted); margin-top: 10px; line-height: 1.6;">
+    © 2026 Amakin LLC. All rights reserved. p4p is operated by Amakin LLC.
+  </div>
+  <div style="margin-top: 8px; display: flex; justify-content: center; gap: 16px; font-size: 11px;">
+    <a href="#" onclick="openTerms(); return false;" style="color: var(--pi-light); text-decoration: none; font-weight: 500; transition: color var(--speed);">Terms of Service</a>
+    <span style="color: var(--text-dim);">|</span>
+    <a href="#" onclick="openPrivacy(); return false;" style="color: var(--pi-light); text-decoration: none; font-weight: 500; transition: color var(--speed);">Privacy Policy</a>
+  </div>
+  <p class="footer-brand" style="margin-top: 12px;">P4P Fan Rankings · Pi Network · 2026</p>
 </footer>
+
+<!-- ============================
+     TERMS & PRIVACY MODALS
+     ============================ -->
+<div class="modal-overlay" id="termsModal" role="dialog" aria-modal="true">
+  <div class="modal-box" style="max-width: 550px; text-align: left; padding: 26px 22px;">
+    <button class="modal-close" onclick="closeTerms()" aria-label="Close">✕</button>
+    <div style="font-family: 'Barlow Condensed', sans-serif; font-size: 26px; font-weight: 800; color: var(--gold); letter-spacing: 1px; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">TERMS OF SERVICE</div>
+    <div style="max-height: 350px; overflow-y: auto; font-size: 13px; line-height: 1.6; color: var(--text-body); padding-right: 10px;">
+      <p style="margin-bottom: 12px;">Welcome to p4p, a fan-driven Pound-for-Pound MMA rankings application. By accessing our services, you agree to these Terms of Service.</p>
+      <p style="margin-bottom: 12px; font-weight: 600; color: var(--text-h);">1. Transactions & Finality</p>
+      <p style="margin-bottom: 12px;">All transactions within the Pi Network are final. p4p is operated by Amakin LLC. The company is not liable for any blockchain failures, network disruptions, or loss of user wallet credentials.</p>
+      <p style="margin-bottom: 12px; font-weight: 600; color: var(--text-h);">2. Purpose of Voting</p>
+      <p style="margin-bottom: 12px;">Voting is done solely for engagement and community statistics. Each vote costs 1 Pi. Voting points are used to compile fan rankings and have no monetary value outside of this platform.</p>
+      <p style="margin-bottom: 12px; font-weight: 600; color: var(--text-h);">3. Acceptance of Terms</p>
+      <p style="margin-bottom: 12px;">If you do not agree to these terms, please do not use the application or proceed with any Pi Network transactions. We reserve the right to alter these terms at any time.</p>
+    </div>
+    <button class="btn-confirm" onclick="closeTerms()" style="margin-top: 18px; width: 100%;">I AGREE</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="privacyModal" role="dialog" aria-modal="true">
+  <div class="modal-box" style="max-width: 550px; text-align: left; padding: 26px 22px;">
+    <button class="modal-close" onclick="closePrivacy()" aria-label="Close">✕</button>
+    <div style="font-family: 'Barlow Condensed', sans-serif; font-size: 26px; font-weight: 800; color: var(--gold); letter-spacing: 1px; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">PRIVACY POLICY</div>
+    <div style="max-height: 350px; overflow-y: auto; font-size: 13px; line-height: 1.6; color: var(--text-body); padding-right: 10px;">
+      <p style="margin-bottom: 12px;">At p4p, operated by Amakin LLC, your privacy is a priority. This document explains how we collect and process information.</p>
+      <p style="margin-bottom: 12px; font-weight: 600; color: var(--text-h);">1. Information Collection</p>
+      <p style="margin-bottom: 12px;">We do not collect sensitive personal details. We collect basic public identifiers provided by the Pi Network SDK (such as Pi username) and transaction details (such as paymentId, transaction TXID) to verify votes casting.</p>
+      <p style="margin-bottom: 12px; font-weight: 600; color: var(--text-h);">2. Third-Party Services</p>
+      <p style="margin-bottom: 12px;">Transaction data is shared with the Pi Network blockchain for validation and processing. We do not sell or lease user information to third-party advertising services.</p>
+      <p style="margin-bottom: 12px; font-weight: 600; color: var(--text-h);">3. Policy Changes</p>
+      <p style="margin-bottom: 12px;">We may update this policy periodically to reflect operational, legal, or regulatory modifications. Continued usage of the site constitutes your consent to the policy.</p>
+    </div>
+    <button class="btn-confirm" onclick="closePrivacy()" style="margin-top: 18px; width: 100%;">CLOSE</button>
+  </div>
+</div>
 
 <!-- ============================
      JAVASCRIPT
@@ -2107,6 +2152,38 @@ document.getElementById('voteModal').addEventListener('click', function(e) {
 });
 
 /* =========================================================
+   COMPLIANCE MODALS HANDLERS (Terms of Service & Privacy Policy)
+   ========================================================= */
+function openTerms() {
+  document.getElementById('termsModal').classList.add('open');
+}
+function closeTerms() {
+  document.getElementById('termsModal').classList.remove('open');
+}
+function openPrivacy() {
+  document.getElementById('privacyModal').classList.add('open');
+}
+function closePrivacy() {
+  document.getElementById('privacyModal').classList.remove('open');
+}
+
+// Event listeners for closing terms/privacy overlays on backdrop clicks
+document.addEventListener('DOMContentLoaded', function() {
+  const termsOverlay = document.getElementById('termsModal');
+  if (termsOverlay) {
+    termsOverlay.addEventListener('click', function(e) {
+      if (e.target === this) closeTerms();
+    });
+  }
+  const privacyOverlay = document.getElementById('privacyModal');
+  if (privacyOverlay) {
+    privacyOverlay.addEventListener('click', function(e) {
+      if (e.target === this) closePrivacy();
+    });
+  }
+});
+
+/* =========================================================
    PI WALLET CONFIRM VOTE ACTION
    ========================================================= */
 function confirmVote() {
@@ -2117,21 +2194,21 @@ function confirmVote() {
   btn.disabled = true;
   btn.innerHTML = `<span class="spinner"></span>${T('loading')}`;
 
-  executePiPayment(name,
+  executePiPayment(name, scoreKey, division,
     // onSuccess
     () => {
       state.scores[scoreKey] = (state.scores[scoreKey] || 0) + 100;
       state.totalVotes++;
       state.totalPi += 1;
       
-      saveVoteToServer(scoreKey, name, division, 100, 1);
       closeModal();
       renderAll();
       showToast(`${T('toastSuccess')} ${name} ${T('toastPts')}`, 'success');
     },
     // onError
-    () => {
-      showToast(T('toastError'), 'error');
+    (errorMsg) => {
+      const errText = errorMsg || T('toastError');
+      showToast(errText, 'error');
     },
     // onFinally
     () => {
@@ -2141,7 +2218,7 @@ function confirmVote() {
   );
 }
 
-function executePiPayment(fighterName, onSuccess, onError, onFinally) {
+function executePiPayment(fighterName, scoreKey, division, onSuccess, onError, onFinally) {
   piPay(
     {
       amount:   1,
@@ -2159,13 +2236,37 @@ function executePiPayment(fighterName, onSuccess, onError, onFinally) {
       },
       onReadyForServerCompletion: function(id, txid) {
         console.log('[Pi SDK] Payment transaction completed:', txid);
-        fetch('/api/complete', {
+        
+        // Securely call server verification endpoint to authorize and record increment
+        fetch('/api/verify-payment', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ paymentId: id, txid: txid })
+          body: JSON.stringify({
+            paymentId: id,
+            fighterId: scoreKey,
+            fighterName: fighterName,
+            division: division
+          })
         })
-        .then(function() { onSuccess(); onFinally(); })
-        .catch(function(e) { console.error('[Pi SDK] Complete record failed:', e); onSuccess(); onFinally(); });
+        .then(function(res) {
+          if (res.status === 200) {
+            return res.json().then(function(data) {
+              onSuccess();
+            });
+          } else {
+            return res.json().then(function(errData) {
+              throw new Error(errData.error || 'Server rejected payment verification');
+            }).catch(function() {
+              throw new Error('Server rejected payment verification');
+            });
+          }
+        })
+        .then(function() { onFinally(); })
+        .catch(function(e) {
+          console.error('[Pi SDK] Verification check failed:', e);
+          onError(e.message);
+          onFinally();
+        });
       },
       onCancel: function(id)     { console.warn('[Pi SDK] Cancelled paymentId:', id); onError();  onFinally(); },
       onError:  function(e, pmt) { console.error('[Pi SDK] Payment runtime error:', e);   onError();  onFinally(); }
