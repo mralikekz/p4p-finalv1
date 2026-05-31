@@ -1732,7 +1732,7 @@ h1, h2, h3, .display {
      ============================ -->
 <div class="sport-tabs-bar">
   <button class="sport-tab active" id="sportTabMma" onclick="setSport('mma')">
-    <span class="sport-tab-emoji">🥋</span> <span data-i18n="sportMMA">MMA</span>
+    <span class="sport-tab-emoji">🥊</span> <span data-i18n="sportMMA">MMA</span>
   </button>
   <button class="sport-tab" id="sportTabBox" onclick="setSport('box')">
     <span class="sport-tab-emoji">🥊</span> <span data-i18n="sportBox">BOXING</span>
@@ -3000,7 +3000,7 @@ function getWrestlerFlagHtml(flagStr) {
   if (!flagStr) return '';
   if (flagStr === '☭ СССР' || flagStr.includes('СССР') || flagStr.includes('USSR')) {
     const text = curLang === 'ru' ? 'СССР' : 'USSR';
-    return `<img src="/public/ussr_flag.svg" alt="${text}" style="height: 12px; width: 22px; object-fit: cover; border: 1px solid rgba(255,255,255,0.15); border-radius: 1px; display: inline-block; vertical-align: middle; margin-right: 5px; position: relative; top: -1px;" />${text}`;
+    return `<img src="/ussr_flag.svg" alt="${text}" style="height: 12px; width: 22px; object-fit: cover; border: 1px solid rgba(255,255,255,0.15); border-radius: 1px; display: inline-block; vertical-align: middle; margin-right: 5px; position: relative; top: -1px;" />${text}`;
   }
   return flagStr;
 }
