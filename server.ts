@@ -335,8 +335,21 @@ async function incrementVote(fighterId: string, fighterName: string, division: s
 
 app.use(express.json());
 
+// Enable CORS for frontend requests like Vercel or local testing
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, PATCH, DELETE");
+  res.setHeader("Access-Control-Allow-Headers", "X-Requested-With,content-type,Authorization");
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  if (req.method === "OPTIONS") {
+    res.sendStatus(200);
+  } else {
+    next();
+  }
+});
+
 // Main official wallet address and API key from environment
-const DEVELOPER_WALLET_ADDRESS = process.env.DEVELOPER_WALLET_ADDRESS || process.env.DEVELOPER_WALLET || "GBHVTAJ7543JH4YE3NMKJQQKGIIN2EDEY2JAWP2H653RPL37VDBFPPLO";
+const DEVELOPER_WALLET_ADDRESS = process.env.DEVELOPER_WALLET_ADDRESS || process.env.DEVELOPER_WALLET || "GCXCW4REFA6PMYKOOI5N7F53P4HJR2SETBIOVTVH3ZAFFG35G47OMTWG";
 const PI_API_KEY = process.env.PI_API_KEY || "";
 
 // Serve the Pi validation-key.txt at the root
@@ -449,24 +462,40 @@ app.post("/api/verify-payment", async (req, res) => {
       }
 
       const pmtData: any = await response.json();
+      console.log(`[Verify API] Received payments data from Pi Network API:`, JSON.stringify(pmtData));
 
       // Criteria (a): Transaction state completed or approved/signed
       const isCompleted = pmtData.status === "completed" || 
-                          (pmtData.status && (pmtData.status.developer_completed === true || pmtData.status.developer_approved === true)) || 
-                          pmtData.state === "completed";
+                          pmtData.state === "completed" ||
+                          (pmtData.status && (
+                            pmtData.status.developer_completed === true || 
+                            pmtData.status.developer_approved === true ||
+                            pmtData.status.transaction_verified === true
+                          )) ||
+                          (pmtData.transaction && pmtData.transaction.verified === true);
 
-      // Criteria (b): Exact size is 1.0 Pi
-      const isAmountValid = pmtData.amount !== undefined && Number(pmtData.amount) === 1.0;
+      // Criteria (b): Exact size is 1.0 Pi (with float tolerance check)
+      const parsedAmount = pmtData.amount !== undefined ? Number(pmtData.amount) : 0;
+      const isAmountValid = Math.abs(parsedAmount - 1.0) < 0.01;
 
-      // Criteria (c): Destination is official wallet (case-insensitive check)
-      const isRecipientValid = pmtData.recipient && pmtData.recipient.toLowerCase() === DEVELOPER_WALLET_ADDRESS.toLowerCase();
+      // Criteria (c): Destination is official wallet (check both to_address and recipient fields)
+      const actualRecipient = (
+        pmtData.to_address || 
+        pmtData.recipient || 
+        pmtData.recipient_address ||
+        (pmtData.transaction && pmtData.transaction.recipient) ||
+        (pmtData.transaction && pmtData.transaction.to_address) ||
+        ""
+      ).toString().trim();
+
+      const isRecipientValid = actualRecipient && actualRecipient.toLowerCase() === DEVELOPER_WALLET_ADDRESS.toLowerCase();
 
       if (!isCompleted) {
         validationError = "Pi Network transaction is not completed or approved yet on blockchain";
       } else if (!isAmountValid) {
-        validationError = `Transaction amount mismatch: expected 1.0, got ${pmtData.amount}`;
+        validationError = `Transaction amount mismatch: expected 1.0, got ${pmtData.amount || parsedAmount}`;
       } else if (!isRecipientValid) {
-        validationError = `Recipient wallet mismatch: expected ${DEVELOPER_WALLET_ADDRESS}, got ${pmtData.recipient}`;
+        validationError = `Recipient wallet mismatch: expected ${DEVELOPER_WALLET_ADDRESS}, got ${actualRecipient || "undefined"}`;
       } else {
         isPaymentValid = true;
       }

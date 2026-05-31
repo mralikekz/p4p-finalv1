@@ -1619,6 +1619,61 @@ h1, h2, h3, .display {
   white-space: nowrap;
   max-width: 100%;
 }
+
+/* =============================================
+   SPORT TABS BAR
+   ============================================= */
+.sport-tabs-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  background: var(--nav-blur);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 60;
+}
+.sport-tab {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 800;
+  font-size: 15px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 8px 18px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--card-bg);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--speed);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.sport-tab:hover:not(.active) {
+  color: var(--text-body);
+  border-color: var(--text-dim);
+}
+.sport-tab.active {
+  background: var(--gold);
+  color: #0c0d12;
+  border-color: var(--gold);
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.25);
+}
+.sport-tab-emoji {
+  font-size: 14px;
+}
+
+/* Adjust app-nav top value so it sticks right below sport-tabs-bar */
+.app-nav {
+  position: sticky;
+  top: 55px; /* height of sport-tabs-bar approximate */
+  z-index: 50;
+}
 </style>
 </head>
 <body>
@@ -1673,6 +1728,21 @@ h1, h2, h3, .display {
 </header>
 
 <!-- ============================
+     SPORT TABS
+     ============================ -->
+<div class="sport-tabs-bar">
+  <button class="sport-tab active" id="sportTabMma" onclick="setSport('mma')">
+    <span class="sport-tab-emoji">🥋</span> <span data-i18n="sportMMA">MMA</span>
+  </button>
+  <button class="sport-tab" id="sportTabBox" onclick="setSport('box')">
+    <span class="sport-tab-emoji">🥊</span> <span data-i18n="sportBox">BOXING</span>
+  </button>
+  <button class="sport-tab" id="sportTabWrestling" onclick="setSport('wrestling')">
+    <span class="sport-tab-emoji">🤼</span> <span data-i18n="sportWrestling">WRESTLING</span>
+  </button>
+</div>
+
+<!-- ============================
      NAVIGATION
      ============================ -->
 <nav class="app-nav" role="navigation">
@@ -1690,6 +1760,22 @@ h1, h2, h3, .display {
     <div class="page-inner">
       <div class="sec-label" data-i18n="p4pSec">Men's P4P · Fan Vote Leaderboard</div>
       <div class="p4p-list" id="p4pList"></div>
+    </div>
+  </div>
+
+  <!-- Boxing P4P Leaderboard -->
+  <div class="page" id="page-box-p4p">
+    <div class="page-inner">
+      <div class="sec-label" data-i18n="boxP4pSec">Men's Boxing P4P · Fan Vote Leaderboard</div>
+      <div class="p4p-list" id="boxP4pList"></div>
+    </div>
+  </div>
+
+  <!-- Wrestling Top 30 Leaderboard -->
+  <div class="page" id="page-wrestling-p30">
+    <div class="page-inner">
+      <div class="sec-label" data-i18n="wrestP4pSec">Freestyle Wrestling Top 30 · Fan Vote Leaderboard</div>
+      <div class="p4p-list" id="wrestP30List"></div>
     </div>
   </div>
 
@@ -1990,6 +2076,11 @@ const LANG = {
     piAuthBullet3: "Your wallet address",
     piAuthAllow: "Allow",
     piAuthDecline: "Decline",
+    sportMMA: "MMA",
+    sportBox: "BOXING",
+    sportWrestling: "WRESTLING",
+    boxP4pSec: "Men's Boxing P4P · Fan Vote Leaderboard",
+    wrestP4pSec: "Freestyle Wrestling Top 30 · Fan Vote Leaderboard",
   },
   ru: {
     subtitle: "Фунт за Фунт · Фанатский Рейтинг",
@@ -2029,6 +2120,11 @@ const LANG = {
     piAuthBullet3: "Ваш адрес кошелька Pi",
     piAuthAllow: "Разрешить",
     piAuthDecline: "Отклонить",
+    sportMMA: "MMA",
+    sportBox: "БОКС",
+    sportWrestling: "БОРЬБА",
+    boxP4pSec: "Мужской бокс P4P · Фанатский рейтинг",
+    wrestP4pSec: "Вольная борьба ТОП-30 · Фанатский рейтинг",
   },
   ar: {
     subtitle: "باوند فور باوند · تصنيف المشجعين",
@@ -2163,13 +2259,19 @@ const EXTRA_GLOSSARY = {
     limit: "Limit", contender: "Division Contender", ranking: "Ranking", vote: "Vote",
     flyweight: "Flyweight", bantamweight: "Bantamweight", featherweight: "Featherweight", lightweight: "Lightweight",
     welterweight: "Welterweight", middleweight: "Middleweight", lightheavyweight: "Light Heavyweight", heavyweight: "Heavyweight",
-    settings: "Settings", login: "Login", pioneerrating: "Pioneer"
+    settings: "Settings", login: "Login", pioneerrating: "Pioneer",
+    sportmma: "MMA", sportbox: "BOXING", sportwrestling: "WRESTLING",
+    boxp4psec: "Top 30 Greatest Boxers in History · Fan Vote Leaderboard",
+    wrestp4psec: "Freestyle Wrestling Top 30 · Fan Vote Leaderboard"
   },
   ru: {
     limit: "Лимит", contender: "Претендент дивизиона", ranking: "Рейтинг", vote: "Голосовать",
     flyweight: "Наилегчайший вес", bantamweight: "Легчайший вес", featherweight: "Полулегкий вес", lightweight: "Легкий вес",
     welterweight: "Полусредний вес", middleweight: "Средний вес", lightheavyweight: "Полутяжелый вес", heavyweight: "Тяжелый вес",
-    settings: "Настройки", login: "Вход", pioneerrating: "Пионер"
+    settings: "Настройки", login: "Вход", pioneerrating: "Пионер",
+    sportmma: "MMA", sportbox: "БОКС", sportwrestling: "БОРЬБА",
+    boxp4psec: "Топ-30 величайших боксеров в истории · Фанатский рейтинг",
+    wrestp4psec: "Вольная борьба ТОП-30 · Фанатский рейтинг"
   },
   ar: {
     limit: "الحد", contender: "منافس القسم", ranking: "التصنيف", vote: "تصويت",
@@ -2295,11 +2397,87 @@ const P4P_LIST = [
   { name:'Justin Gaethje',       flag:'🇺🇸', div:'Lightweight',                record:'27-5'   },
 ];
 
+/* ---- Boxing Official Top-30 Greatest Boxers in History ---- */
+const BOXING_LIST = [
+  { name: 'Sugar Ray Robinson', nameRu: 'Шугар Рэй Робинсон', flag: '🇺🇸', div: 'Welterweight & 5-time Middleweight Champion', divRu: 'Чемпион в полусреднем и 5-кратный чемпион в среднем весе. Эталон P4P.', record: '173-19-6 (109 KO)' },
+  { name: 'Muhammad Ali', nameRu: 'Мухаммед Али', flag: '🇺🇸', div: '3-time Lineal Heavyweight Champion', divRu: '3-кратный линейный чемпион в тяжелом весе. Икона мирового спорта.', record: '56-5 (37 KO)' },
+  { name: 'Henry Armstrong', nameRu: 'Генри Армстронг', flag: '🇺🇸', div: 'Simultaneous 3-division World Champion', divRu: 'Единственный боксер в истории, одновременно владевший титулами в 3 разных весах.', record: '150-21-9 (101 KO)' },
+  { name: 'Joe Louis', nameRu: 'Джо Луис', flag: '🇺🇸', div: 'Heavyweight Champion (Record 25 defenses, 11+ years)', divRu: 'Удерживал титул в тяжелом весе рекордные 11 лет и 8 месяцев (25 защит).', record: '66-3 (52 KO)' },
+  { name: 'Roberto Duran', nameRu: 'Роберто Дюран', flag: '🇵🇦', div: '4-division Champion, Greatest lightweight in history', divRu: 'Чемпион в 4 весовых категориях, величайший легковас в истории.', record: '103-16 (70 KO)' },
+  { name: 'Floyd Mayweather Jr.', nameRu: 'Флойд Мейвезер-младший', flag: '🇺🇸', div: 'Undefeated 5-division Champion (50-0)', divRu: 'Непобежденный чемпион в 5 весах с идеальным рекордом 50-0 и эталонной защитой.', record: '50-0 (27 KO)' },
+  { name: 'Sugar Ray Leonard', nameRu: 'Шугар Рэй Леонард', flag: '🇺🇸', div: '5-division Champion, Defeated Duran, Hagler, Hearns', divRu: 'Чемпион в 5 весовых категориях, побеждавший Дюрана, Хаглера и Хёрнса.', record: '36-3-1 (25 KO)' },
+  { name: 'Manny Pacquiao', nameRu: 'Мэнни Пакьяо', flag: '🇵🇭', div: 'Only 8-division World Champion in history', divRu: 'Единственный в истории чемпион мира в 8 разных весовых категориях.', record: '62-8-2 (39 KO)' },
+  { name: 'Willie Pep', nameRu: 'Вилли Пеп', flag: '🇺🇸', div: 'Two-time Featherweight Champion (229 wins)', divRu: 'Двукратный чемпион в полулегком весе, одержавший феноменальные 229 побед.', record: '229-11-1 (65 KO)' },
+  { name: 'Julio Cesar Chavez', nameRu: 'Хулио Сесар Чавес', flag: '🇲🇽', div: '3-division Champion, 87-0 unbeaten start', divRu: 'Чемпион в 3 весах, начавший карьеру с безумной беспроигрышной серии 87-0.', record: '107-6-2 (85 KO)' },
+  { name: 'Marvelous Marvin Hagler', nameRu: 'Марвелус Марвин Хаглер', flag: '🇺🇸', div: 'Undisputed Middleweight Champion (12 defenses)', divRu: 'Один из самых жестких абсолютных чемпионов в среднем весе (12 защит).', record: '62-3-2 (52 KO)' },
+  { name: 'Roy Jones Jr.', nameRu: 'Рой Джонс-младший', flag: '🇺🇸', div: '4-division Champion, Middleweight to Heavyweight', divRu: 'Чемпион в 4 весах, уникальный атлет, дошедший от среднего до тяжелого веса.', record: '66-10 (47 KO)' },
+  { name: 'Saul "Canelo" Alvarez', nameRu: 'Сауль «Канело» Альварес', flag: '🇲🇽', div: '4-division Champion, First Undisputed Super Middleweight', divRu: 'Чемпион мира в 4 весовых категориях, первый в истории абсолютный чемпион в суперсреднем весе.', record: '62-2-2 (39 KO)' },
+  { name: 'Gennadiy "GGG" Golovkin', nameRu: 'Геннадий «GGG» Головкин', flag: '🇰🇿', div: '2-time Middleweight Champion, Peak 89.7% KO ratio', divRu: '2-кратный чемпион мира в среднем весе. Рекорд по числу защит титула (20).', record: '42-2-1 (37 KO)' },
+  { name: 'Pernell Whitaker', nameRu: 'Пернелл Уитакер', flag: '🇺🇸', div: '4-division Champion, Defensive genius', divRu: 'Чемпион в 4 весовых категориях, гений защитного стиля «неуловимый левша».', record: '40-4-1 (17 KO)' },
+  { name: 'Ezzard Charles', nameRu: 'Эззард Чарльз', flag: '🇺🇸', div: 'Heavyweight Champion, All-time Light Heavyweight Great', divRu: 'Чемпион мира в тяжелом весе, признанный экспертами величайшим полутяжем всех времен.', record: '93-25-1 (52 KO)' },
+  { name: 'Archie Moore', nameRu: 'Арчи Мур', flag: '🇺🇸', div: 'Light Heavyweight Champion (10 years, 132 KOs)', divRu: 'Удерживал титул в полутяжелом весе 10 лет. Обладатель рекорда по нокаутам — 132 KO.', record: '186-23-10 (132 KO)' },
+  { name: 'Rocky Marciano', nameRu: 'Рокки Марчиано', flag: '🇺🇸', div: 'Undefeated Heavyweight Champion', divRu: 'Единственный чемпион-тяжеловес, ушедший непобежденным с рекордом 49-0.', record: '49-0 (43 KO)' },
+  { name: 'George Foreman', nameRu: 'Джордж Форман', flag: '🇺🇸', div: 'Two-time Heavyweight Champion, Re-won at age 45', divRu: 'Легендарный панчер, вернувший титул в тяжелом весе в возрасте 45 лет.', record: '76-5 (68 KO)' },
+  { name: 'Thomas Hearns', nameRu: 'Томас Хёрнс', flag: '🇺🇸', div: 'First 5-division World Champion, "The Hitman"', divRu: '«Хитмэн». Первый боксер, завоевавший титулы в 4, а затем и в 5 весовых категориях.', record: '61-5-1 (48 KO)' },
+  { name: 'Oleksandr Usyk', nameRu: 'Александр Усик', flag: '🇺🇦', div: 'Undisputed Cruiserweight & Heavyweight Champion', divRu: 'Абсолютный чемпион мира в крузервейте и абсолютный чемпион в тяжелом весе.', record: '22-0 (14 KO)' },
+  { name: 'Lennox Lewis', nameRu: 'Леннокс Льюис', flag: '🇬🇧', div: 'Last Undisputed Heavyweight of Classic Era', divRu: 'Последний абсолютный чемпион-тяжеловес классической эры.', record: '41-2-1 (32 KO)' },
+  { name: 'Sam Langford', nameRu: 'Сэм Лэнгфорд', flag: '🇨🇦', div: 'Lightweight to Heavyweight, Legendary puncher', divRu: 'Боксировал от легкого до тяжелого веса, грозный панчер начала XX века.', record: '180-29-39 (128 KO)' },
+  { name: 'Joe Frazier', nameRu: 'Джо Фрейзер', flag: '🇺🇸', div: '"Smokin\' Joe", First to defeat Muhammad Ali', divRu: '«Дымящийся Джо», обладатель сокрушительного левого хука, первым победивший Али.', record: '32-4-1 (27 KO)' },
+  { name: 'Jack Dempsey', nameRu: 'Джеки Демпси', flag: '🇺🇸', div: 'Heavyweight Icon, Shaped Modern Boxing style', divRu: 'Культурная икона 1920-х, чей яростный стиль сформировал современный бокс.', record: '54-6-9 (44 KO)' },
+  { name: 'Mike Tyson', nameRu: 'Майк Тайсон', flag: '🇺🇸', div: 'Youngest Heavyweight Champion in History (Age 20)', divRu: '«Железный Майк». Самый молодой чемпион мира в тяжелом весе в истории (20 лет).', record: '50-6 (44 KO)' },
+  { name: 'Evander Holyfield', nameRu: 'Эвандер Холифилд', flag: '🇺🇸', div: 'Only 4-time Heavyweight & Undisputed Cruiserweight', divRu: 'Единственный 4-кратный чемпион мира в тяжелом весе и абсолют в крузервейте.', record: '44-10-2 (29 KO)' },
+  { name: 'Bernard Hopkins', nameRu: 'Бернард Хопкинс', flag: '🇺🇸', div: '20 defenses, Oldest Champion in History (won at 49)', divRu: '«Палач». 20 защит в среднем весе, самый старый чемпион мира в истории.', record: '55-8-2 (32 KO)' },
+  { name: 'Carlos Monzon', nameRu: 'Карлос Монсон', flag: '🇦🇷', div: 'Dominant Middleweight, Undefeated for Final 14 Years', divRu: 'Величайший доминирующий средневес 1970-х, не проигрывавший последние 14 лет.', record: '87-3-9 (59 KO)' },
+  { name: 'Terence Crawford', nameRu: 'Теренс Кроуфорд', flag: '🇺🇸', div: 'First 2-division Undisputed Champion (4-belt Era)', divRu: 'Первый в истории боксер, ставший абсолютным чемпионом мира в двух весовых категориях.', record: '41-0 (31 KO)' },
+];
+
+/* ---- Wrestling Official Top-30 (Freestyle) ---- */
+const WRESTLING_LIST = [
+  { name:'Aleksandr Medved',      flag:'☭ СССР', div:'3-time Olympic Champion, 7-time World Champion', record:'Freestyle' },
+  { name:'Buvaisar Saitiev',      flag:'🇷🇺 RUS',  div:'3-time Olympic Champion, 6-time World Champion', record:'Freestyle' },
+  { name:'Abdulrashid Sadulaev',  flag:'🇷🇺 RUS',  div:'2-time Olympic Champion, 6-time World Champion', record:'Freestyle' },
+  { name:'Valentin Yordanov',     flag:'🇧🇬 BUL',  div:'Olympic Champion, 7-time World Champion',        record:'Freestyle' },
+  { name:'Sergei Beloglazov',     flag:'☭ СССР', div:'2-time Olympic Champion, 6-time World Champion', record:'Freestyle' },
+  { name:'Arsen Fadzayev',        flag:'☭ СССР', div:'2-time Olympic Champion, 6-time World Champion', record:'Freestyle' },
+  { name:'Jordan Burroughs',      flag:'🇺🇸 USA',  div:'Olympic Champion, 6-time World Champion',        record:'Freestyle' },
+  { name:'John Smith',            flag:'🇺🇸 USA',  div:'2-time Olympic Champion, 4-time World Champion', record:'Freestyle' },
+  { name:'Makharbek Khadartsev',  flag:'☭ СССР', div:'2-time Olympic Champion, 5-time World Champion', record:'Freestyle' },
+  { name:'Mustafa Dagistanli',    flag:'🇹🇷 TUR',  div:'2-time Olympic Champion, 3-time World Champion', record:'Freestyle' },
+  { name:'Ivan Yarygin',          flag:'☭ СССР', div:'2-time Olympic Champion, World Champion',        record:'Freestyle' },
+  { name:'Bruce Baumgartner',     flag:'🇺🇸 USA',  div:'2-time Olympic Champion, 3-time World Champion', record:'Freestyle' },
+  { name:'Levan Tediashvili',     flag:'☭ СССР', div:'2-time Olympic Champion, 4-time World Champion', record:'Freestyle' },
+  { name:'Soslan Andiev',         flag:'☭ СССР', div:'2-time Olympic Champion, 4-time World Champion', record:'Freestyle' },
+  { name:'Khadzhimurat Gatsalov',  flag:'🇷🇺 RUS',  div:'Olympic Champion, 5-time World Champion',        record:'Freestyle' },
+  { name:'Abdullah Movahed',      flag:'🇮🇷 IRI',  div:'Olympic Champion, 5-time World Champion',        record:'Freestyle' },
+  { name:'Mavlet Batirov',        flag:'🇷🇺 RUS',  div:'2-time Olympic Champion, World Champion',        record:'Freestyle' },
+  { name:'Zaurbek Sidakov',       flag:'🇷🇺 RUS',  div:'Olympic Champion, 3-time World Champion',        record:'Freestyle' },
+  { name:'David Taylor',          flag:'🇺🇸 USA',  div:'Olympic Champion, 3-time World Champion',        record:'Freestyle' },
+  { name:'Hassan Yazdani',        flag:'🇮🇷 IRI',  div:'Olympic Champion, 3-time World Champion',        record:'Freestyle' },
+  { name:'Leri Khabelov',         flag:'☭ СССР', div:'Olympic Champion, 5-time World Champion',        record:'Freestyle' },
+  { name:'Ali Aliev',             flag:'☭ СССР', div:'5-time World Champion',                          record:'Freestyle' },
+  { name:'Kyle Snyder',           flag:'🇺🇸 USA',  div:'Olympic Champion, 3-time World Champion',        record:'Freestyle' },
+  { name:'Vladimir Yumin',        flag:'☭ СССР', div:'Olympic Champion, 4-time World Champion',        record:'Freestyle' },
+  { name:'Anatoly Beloglazov',    flag:'☭ СССР', div:'Olympic Champion, 3-time World Champion',        record:'Freestyle' },
+  { name:'Yuji Takada',           flag:'🇯🇵 JPN',  div:'Olympic Champion, 4-time World Champion',        record:'Freestyle' },
+  { name:'David Musulbes',        flag:'🇷🇺/🇸🇰',  div:'Olympic Champion, 2-time World Champion',        record:'Freestyle' },
+  { name:'Geno Petriashvili',     flag:'🇬🇪 GEO',  div:'Olympic Champion, 3-time World Champion',        record:'Freestyle' },
+  { name:'Taha Akgul',            flag:'🇹🇷 TUR',  div:'Olympic Champion, 3-time World Champion',        record:'Freestyle' },
+  { name:'Adam Saitiev',          flag:'🇷🇺 RUS',  div:'Olympic Champion, 2-time World Champion',        record:'Freestyle' },
+];
+
 /* ---- Helper to map weight class athletes to P4P key ---- */
 function getP4PKey(name) {
   const pIdx = P4P_LIST.findIndex(f => f.name.toLowerCase() === name.toLowerCase());
   if (pIdx !== -1) {
     return `p4p_${pIdx}`;
+  }
+  const bIdx = BOXING_LIST.findIndex(f => f.name.toLowerCase() === name.toLowerCase() || (f.nameRu && f.nameRu.toLowerCase() === name.toLowerCase()));
+  if (bIdx !== -1) {
+    return `box_${bIdx}`;
+  }
+  const wIdx = WRESTLING_LIST.findIndex(f => f.name.toLowerCase() === name.toLowerCase());
+  if (wIdx !== -1) {
+    return `wrest_${wIdx}`;
   }
   return `p4p_notlist_${name.toLowerCase().replace(/[^a-z0-9]/g, '_')}`;
 }
@@ -2502,6 +2680,12 @@ function initDefaultScores() {
   P4P_LIST.forEach((_, idx) => {
     state.scores[`p4p_${idx}`] = 2000 - idx * 100;
   });
+  BOXING_LIST.forEach((_, idx) => {
+    state.scores[`box_${idx}`] = 3000 - idx * 80;
+  });
+  WRESTLING_LIST.forEach((_, idx) => {
+    state.scores[`wrest_${idx}`] = 1500 - idx * 40;
+  });
   WEIGHT_CLASSES.forEach((wc) => {
     const champKey = getP4PKey(wc.champ.name);
     if (state.scores[champKey] === undefined) {
@@ -2519,7 +2703,10 @@ function initDefaultScores() {
 /* =========================================================
    PI SDK INTEGRATION
    ========================================================= */
-var API_BASE = '/api';
+// Automatically route API requests to live Cloud Run backend if hosted on Vercel
+var API_BASE = (window.location.hostname.indexOf('vercel.app') !== -1 || window.location.hostname.indexOf('github.io') !== -1 || window.location.href.indexOf('p4p-final') !== -1)
+  ? 'https://ais-pre-o257qajz2hz4kkyzdbpemz-774972843387.europe-west2.run.app/api'
+  : '/api';
 
 /* ---- Load globally persisted scores from DB ---- */
 function loadVotesFromServer() {
@@ -2588,7 +2775,7 @@ function initPi() {
     function onIncompletePaymentFound(pmt) {
       console.log('[Pi] Unresolved payment discovered:', pmt && pmt.id);
       if (pmt && pmt.identifier) {
-        fetch('/api/complete', {
+        fetch(API_BASE + '/complete', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ paymentId: pmt.identifier, txid: pmt.transaction && pmt.transaction.txid || 'unknown' })
@@ -2761,6 +2948,142 @@ function renderP4P() {
   });
 }
 
+function renderBoxingP4P() {
+  const enriched = BOXING_LIST.map((f, i) => ({
+    ...f,
+    officialRank: i + 1,
+    pts: state.scores[`box_${i}`] || 0
+  }));
+  enriched.sort((a, b) => b.pts - a.pts || a.officialRank - b.officialRank);
+
+  const maxPts = Math.max(1, ...enriched.map(f => f.pts));
+  const container = document.getElementById('boxP4pList');
+  if (!container) return;
+  container.innerHTML = '';
+
+  enriched.forEach((f, idx) => {
+    const fanRank = idx + 1;
+    const pct = Math.round((f.pts / maxPts) * 100);
+    const rankClass = fanRank === 1 ? 'gold' : fanRank === 2 ? 'silver' : fanRank === 3 ? 'bronze' : '';
+    
+    // Choose localized name and division description
+    const displayName = curLang === 'ru' && f.nameRu ? f.nameRu : f.name;
+    const displayDiv = curLang === 'ru' && f.divRu ? f.divRu : f.div;
+
+    const card = document.createElement('div');
+    card.className = 'p4p-card';
+    card.setAttribute('data-rank', fanRank);
+    card.innerHTML = `
+      <div class="rank-num ${rankClass}">${fanRank}</div>
+      <div class="fighter-info">
+        <div class="fighter-name"><span class="flag">${f.flag}</span>${displayName}</div>
+        <div class="fighter-meta">${displayDiv} · ${f.record} · ${T('p4pOfficialRank')} #${f.officialRank}</div>
+      </div>
+      <div class="score-wrap">
+        <div class="score-pts">${f.pts > 0 ? f.pts.toLocaleString() + ' ' + T('pts') : '0 ' + T('pts')}</div>
+        <div class="score-bar-bg"><div class="score-bar-fill" style="width:${pct}%"></div></div>
+      </div>
+      <button class="btn-vote" id="vote-box-${f.officialRank - 1}">1π</button>
+    `;
+    container.appendChild(card);
+
+    const btn = document.getElementById(`vote-box-${f.officialRank - 1}`);
+    if (btn) {
+      btn.onclick = function() {
+        openModal(displayName, f.flag, displayDiv, f.officialRank - 1);
+      };
+    }
+  });
+}
+
+function getWrestlerFlagHtml(flagStr) {
+  if (!flagStr) return '';
+  if (flagStr === '☭ СССР' || flagStr.includes('СССР') || flagStr.includes('USSR')) {
+    const text = curLang === 'ru' ? 'СССР' : 'USSR';
+    return `<img src="/public/ussr_flag.svg" alt="${text}" style="height: 12px; width: 22px; object-fit: cover; border: 1px solid rgba(255,255,255,0.15); border-radius: 1px; display: inline-block; vertical-align: middle; margin-right: 5px; position: relative; top: -1px;" />${text}`;
+  }
+  return flagStr;
+}
+
+function renderWrestlingTop30() {
+  const enriched = WRESTLING_LIST.map((f, i) => ({
+    ...f,
+    officialRank: i + 1,
+    pts: state.scores[`wrest_${i}`] || 0
+  }));
+  enriched.sort((a, b) => b.pts - a.pts || a.officialRank - b.officialRank);
+
+  const maxPts = Math.max(1, ...enriched.map(f => f.pts));
+  const container = document.getElementById('wrestP30List');
+  if (!container) return;
+  container.innerHTML = '';
+
+  enriched.forEach((f, idx) => {
+    const fanRank = idx + 1;
+    const pct = Math.round((f.pts / maxPts) * 100);
+    const rankClass = fanRank === 1 ? 'gold' : fanRank === 2 ? 'silver' : fanRank === 3 ? 'bronze' : '';
+    
+    const card = document.createElement('div');
+    card.className = 'p4p-card';
+    card.setAttribute('data-rank', fanRank);
+    card.innerHTML = `
+      <div class="rank-num ${rankClass}">${fanRank}</div>
+      <div class="fighter-info">
+        <div class="fighter-name"><span class="flag">${getWrestlerFlagHtml(f.flag)}</span>${f.name}</div>
+        <div class="fighter-meta">${translateX(f.div)} · ${f.record} · ${T('p4pOfficialRank')} #${f.officialRank}</div>
+      </div>
+      <div class="score-wrap">
+        <div class="score-pts">${f.pts > 0 ? f.pts.toLocaleString() + ' ' + T('pts') : '0 ' + T('pts')}</div>
+        <div class="score-bar-bg"><div class="score-bar-fill" style="width:${pct}%"></div></div>
+      </div>
+      <button class="btn-vote" id="vote-wrest-${f.officialRank - 1}">1π</button>
+    `;
+    container.appendChild(card);
+
+    const btn = document.getElementById(`vote-wrest-${f.officialRank - 1}`);
+    if (btn) {
+      btn.onclick = function() {
+        openModal(f.name, f.flag, f.div, f.officialRank - 1);
+      };
+    }
+  });
+}
+
+function translateX(text) {
+  if (!text) return '';
+  // Simplify translation for complex text or return directly
+  return text;
+}
+
+let currentSport = 'mma';
+function setSport(sport) {
+  currentSport = sport;
+  
+  // Highlight active tab
+  document.querySelectorAll('.sport-tab').forEach(b => b.classList.remove('active'));
+  
+  if (sport === 'mma') {
+    document.getElementById('sportTabMma').classList.add('active');
+    document.querySelector('.app-nav').style.display = 'block';
+    
+    // Default back to P4P top tab
+    showPage('p4p');
+    // Highlight the P4P tab in subnav
+    const firstTab = document.querySelector('.nav-tab');
+    if (firstTab) firstTab.classList.add('active');
+  } else if (sport === 'box') {
+    document.getElementById('sportTabBox').classList.add('active');
+    document.querySelector('.app-nav').style.display = 'none';
+    
+    showPage('box-p4p');
+  } else if (sport === 'wrestling') {
+    document.getElementById('sportTabWrestling').classList.add('active');
+    document.querySelector('.app-nav').style.display = 'none';
+    
+    showPage('wrestling-p30');
+  }
+}
+
 /* =========================================================
    RENDER WEIGHT CLASS FIGHTER LIST WITH INDIVIDUAL VOTE BUTTONS
    ========================================================= */
@@ -2835,6 +3158,8 @@ function renderWeightClass(wc) {
    ========================================================= */
 function renderAll() {
   renderP4P();
+  renderBoxingP4P();
+  renderWrestlingTop30();
   WEIGHT_CLASSES.forEach(wc => renderWeightClass(wc));
   document.getElementById('statVotes').textContent = state.totalVotes.toLocaleString();
   document.getElementById('statPi').textContent = state.totalPi.toFixed(1) + ' π';
@@ -2947,7 +3272,7 @@ function proceedWithSimulatedAuth() {
 }
 
 function registerUserOnBackend(username, walletAddress, showAlert) {
-  fetch('/api/register', {
+  fetch(API_BASE + '/register', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ username: username, walletAddress: walletAddress })
@@ -3038,7 +3363,7 @@ function loadPioneersList() {
     </tr>
   `;
   
-  fetch('/api/users')
+  fetch(API_BASE + '/users')
   .then(function(r) { return r.json(); })
   .then(function(users) {
     if (Array.isArray(users)) {
@@ -3140,7 +3465,13 @@ function openModal(name, flag, division, idx, type) {
     name, flag, division
   };
   
-  document.getElementById('mName').textContent = flag + ' ' + name;
+  const mNameEl = document.getElementById('mName');
+  const displayFlag = getWrestlerFlagHtml(flag);
+  if (displayFlag.includes('<img') || displayFlag.includes('<svg')) {
+    mNameEl.innerHTML = displayFlag + ' ' + name;
+  } else {
+    mNameEl.textContent = displayFlag + ' ' + name;
+  }
   document.getElementById('mDiv').textContent = division;
   
   // Re-translate pop-up indicators on demand
@@ -3245,7 +3576,7 @@ function executePiPayment(fighterName, scoreKey, division, onSuccess, onError, o
     {
       onReadyForServerApproval: function(id) {
         console.log('[Pi SDK] Payment approval request received:', id);
-        fetch('/api/approve', {
+        fetch(API_BASE + '/approve', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ paymentId: id })
@@ -3255,7 +3586,7 @@ function executePiPayment(fighterName, scoreKey, division, onSuccess, onError, o
         console.log('[Pi SDK] Payment transaction completed:', txid);
         
         // Securely call server verification endpoint to authorize and record increment
-        fetch('/api/verify-payment', {
+        fetch(API_BASE + '/verify-payment', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -3274,7 +3605,10 @@ function executePiPayment(fighterName, scoreKey, division, onSuccess, onError, o
           } else {
             return res.json().then(function(errData) {
               throw new Error(errData.error || 'Server rejected payment verification');
-            }).catch(function() {
+            }).catch(function(err) {
+              if (err && err.message && !err.message.includes('JSON')) {
+                throw err;
+              }
               throw new Error('Server rejected payment verification');
             });
           }
@@ -3311,6 +3645,7 @@ function init() {
   initDefaultScores();
   buildWeightPages();
   buildNavTabs();
+  setSport('mma');
 
   // Load language settings from storage
   const savedLang = localStorage.getItem('p4p_lang') || 'en';
