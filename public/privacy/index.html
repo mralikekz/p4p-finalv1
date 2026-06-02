@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Privacy Policy | P4P Fan Rankings</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --gold: #F5C518;
+      --gold-glow: rgba(245, 197, 24, 0.15);
+      --pi: #6922D4;
+      --pi-light: #B07EFF;
+      --bg-root: #08080f;
+      --bg-card: #141420;
+      --border: rgba(255, 255, 255, 0.08);
+      --text-h: #FFFFFF;
+      --text-body: #C8C8D8;
+      --text-muted: #60607a;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--bg-root);
+      color: var(--text-body);
+      font-family: 'Barlow', sans-serif;
+      font-weight: 500;
+      line-height: 1.6;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 650px;
+      padding: 40px 20px;
+      margin: auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .logo-container {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .logo-emoji {
+      font-size: 32px;
+      animation: pulse 2s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    .app-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 36px;
+      letter-spacing: 2px;
+      color: var(--gold);
+      text-shadow: 0 0 10px var(--gold-glow);
+    }
+
+    h1 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800;
+      font-size: 32px;
+      letter-spacing: 1px;
+      color: var(--text-h);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    .last-updated {
+      font-size: 13px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+
+    .policy-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 30px 24px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    p {
+      margin-bottom: 20px;
+      font-size: 15px;
+    }
+
+    h2 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 22px;
+      color: var(--gold);
+      margin-top: 30px;
+      margin-bottom: 12px;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 6px;
+    }
+
+    ul {
+      margin-left: 20px;
+      margin-bottom: 20px;
+    }
+
+    li {
+      margin-bottom: 10px;
+      font-size: 15px;
+    }
+
+    strong {
+      color: var(--text-h);
+    }
+
+    footer {
+      margin-top: 40px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-top: 25px;
+      color: var(--pi-light);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+      transition: color 0.2s;
+    }
+
+    .back-link:hover {
+      color: #FFF;
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 20px 15px;
+      }
+      .policy-card {
+        padding: 20px 16px;
+      }
+      h1 {
+        font-size: 26px;
+      }
+      .app-title {
+        font-size: 30px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <div class="logo-container">
+        <span class="logo-emoji">🥊</span>
+        <span class="app-title">P4P</span>
+      </div>
+      <h1>Privacy Policy</h1>
+      <div class="last-updated">Last Updated: June 2, 2026</div>
+    </header>
+
+    <main class="policy-card">
+      <p>At P4P, operated by Amakin LLC, your privacy is our absolute priority. This document explains in a simple, transparent, and secure way how we collect and process information.</p>
+
+      <h2>1. Information Collection</h2>
+      <p>We respect the decentralized nature of Web3. P4P does NOT collect any sensitive or traditional personal data, such as your passwords, real names, email addresses, or phone numbers.</p>
+      <ul>
+        <li><strong>Pi Network Data:</strong> Through the official Pi Network SDK, we only access your basic public identifiers: your public Pi username and unique User ID.</li>
+        <li><strong>Transaction Details:</strong> We collect transaction data, including the payment ID and transaction hash (TXID), exclusively to verify, validate, and count your casted votes in the athlete rankings.</li>
+      </ul>
+
+      <h2>2. Third-Party Services & Data Sharing</h2>
+      <ul>
+        <li><strong>Blockchain Validation:</strong> Your transaction and payment data are shared solely with the Pi Network blockchain to verify authenticity.</li>
+        <li><strong>No Commercial Sharing:</strong> We do not sell, rent, trade, or lease your information to third-party advertising networks or external services. Your data is used strictly for in-app utility.</li>
+      </ul>
+
+      <h2>3. Consent and Policy Changes</h2>
+      <p>By continuing to use the P4P application and participating in the athlete ranking votes, you automatically agree to these terms. We may periodically update this policy to reflect operational or regulatory modifications. Continued usage of the site constitutes your consent to the updated policy.</p>
+
+      <h2>4. Contact Us</h2>
+      <p>If you have any questions regarding this Privacy Policy, feel free to reach out to us at: <a href="mailto:alikentiii88@gmail.com" style="color: var(--pi-light); text-decoration: none;">alikentiii88@gmail.com</a>.</p>
+      
+      <div style="text-align: center;">
+        <a href="/" class="back-link">← Return to P4P Application</a>
+      </div>
+    </main>
+
+    <footer>
+      <p>© 2026 Amakin LLC. All rights reserved.<br>P4P is operated by Amakin LLC.</p>
+    </footer>
+  </div>
+
+</body>
+</html>

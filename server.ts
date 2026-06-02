@@ -590,6 +590,16 @@ app.post("/api/complete", async (req, res) => {
   }
 });
 
+// Dedicated standalone routes to pass Pi Network Core Team portal moderation:
+// App's Privacy Policy URL and App's Terms of Service URL
+app.get(["/privacy", "/privacy.html"], (req, res) => {
+  res.sendFile(path.join(process.cwd(), "public/privacy.html"));
+});
+
+app.get(["/terms", "/terms.html"], (req, res) => {
+  res.sendFile(path.join(process.cwd(), "public/terms.html"));
+});
+
 async function startServer() {
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({

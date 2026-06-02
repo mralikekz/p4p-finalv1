@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Terms of Service | P4P Fan Rankings</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --gold: #F5C518;
+      --gold-glow: rgba(245, 197, 24, 0.15);
+      --pi: #6922D4;
+      --pi-light: #B07EFF;
+      --bg-root: #08080f;
+      --bg-card: #141420;
+      --border: rgba(255, 255, 255, 0.08);
+      --text-h: #FFFFFF;
+      --text-body: #C8C8D8;
+      --text-muted: #60607a;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--bg-root);
+      color: var(--text-body);
+      font-family: 'Barlow', sans-serif;
+      font-weight: 500;
+      line-height: 1.6;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 650px;
+      padding: 40px 20px;
+      margin: auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .logo-container {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .logo-emoji {
+      font-size: 32px;
+      animation: pulse 2s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    .app-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 36px;
+      letter-spacing: 2px;
+      color: var(--gold);
+      text-shadow: 0 0 10px var(--gold-glow);
+    }
+
+    h1 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800;
+      font-size: 32px;
+      letter-spacing: 1px;
+      color: var(--text-h);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    .last-updated {
+      font-size: 13px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+
+    .policy-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 30px 24px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    p {
+      margin-bottom: 20px;
+      font-size: 15px;
+    }
+
+    h2 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 22px;
+      color: var(--gold);
+      margin-top: 30px;
+      margin-bottom: 12px;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 6px;
+    }
+
+    ul {
+      margin-left: 20px;
+      margin-bottom: 20px;
+    }
+
+    li {
+      margin-bottom: 10px;
+      font-size: 15px;
+    }
+
+    strong {
+      color: var(--text-h);
+    }
+
+    footer {
+      margin-top: 40px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-top: 25px;
+      color: var(--pi-light);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+      transition: color 0.2s;
+    }
+
+    .back-link:hover {
+      color: #FFF;
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 20px 15px;
+      }
+      .policy-card {
+        padding: 20px 16px;
+      }
+      h1 {
+        font-size: 26px;
+      }
+      .app-title {
+        font-size: 30px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <div class="logo-container">
+        <span class="logo-emoji">🥊</span>
+        <span class="app-title">P4P</span>
+      </div>
+      <h1>Terms of Service</h1>
+      <div class="last-updated">Last Updated: June 2, 2026</div>
+    </header>
+
+    <main class="policy-card">
+      <p>Welcome to p4p, a fan-driven Pound-for-Pound MMA rankings application. By accessing or using our services, you agree to comply with and be bound by these Terms of Service.</p>
+
+      <h2>1. Transactions & Finality</h2>
+      <p>All voting transactions sent within the Pi Network mainnet or testnet blockchain environments are final and irreversible. P4P is operated by Amakin LLC. The company, its developers, and affiliates are not liable for any decentralized blockchain failures, network disruptions, wallet access issues, or loss of user digital credentials.</p>
+
+      <h2>2. Purpose of Voting & Digital Points</h2>
+      <p>Voting is conducted strictly for entertaining engagement and community ranking statistics. Each casted vote points increase a fighter's placement in our leaderboards. Voting points are strictly intended to compile crowd-sourced fan rankings. These points and ranks have absolutely no monetary worth, investment utility, financial returns, or value outside of this platform.</p>
+
+      <h2>3. Decentralized Usage & Security</h2>
+      <p>You recognize that you are solely responsible for keeping your Pi Network account, node passphrase, or blockchain credentials secure. P4P never stores, processes, or requests your private wallet keys or passphrase, as all transactions are securely initialized through the official Pi Network Sandboxed SDK container.</p>
+
+      <h2>4. Acceptance of Terms</h2>
+      <p>If you do not agree to these Terms of Service, please do not use the application or proceed with any Pi Network transactions. We reserve the right to alter or update these terms at any time. Continued usage of the site constitutes your complete consent to the updated policy.</p>
+
+      <h2>5. Contact Information</h2>
+      <p>For any legal inquiries, questions, or clarification regarding these Terms of Service, reach out to us at: <a href="mailto:alikentiii88@gmail.com" style="color: var(--pi-light); text-decoration: none;">alikentiii88@gmail.com</a>.</p>
+      
+      <div style="text-align: center;">
+        <a href="/" class="back-link">← Return to P4P Application</a>
+      </div>
+    </main>
+
+    <footer>
+      <p>© 2026 Amakin LLC. All rights reserved.<br>P4P is operated by Amakin LLC.</p>
+    </footer>
+  </div>
+
+</body>
+</html>
