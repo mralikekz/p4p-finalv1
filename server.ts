@@ -32,19 +32,7 @@ interface VoteEntry {
 const rateLimits = new Map<string, RateLimitEntry>();
 
 function checkRateLimit(ip: string): boolean {
-  const now = Date.now();
-  const entry = rateLimits.get(ip);
-  if (!entry || now > entry.resetTime) {
-    rateLimits.set(ip, {
-      count: 1,
-      resetTime: now + 60 * 1000 // 1 minute sliding window
-    });
-    return true;
-  }
-  if (entry.count >= 3) {
-    return false;
-  }
-  entry.count++;
+  // Unlimited voting allowed for Pioneers (as requested: can vote up to 10000 times without limits)
   return true;
 }
 
@@ -371,6 +359,34 @@ app.get("/api/get-votes", async (req, res) => {
 app.get("/api/votes", async (req, res) => {
   const votes = await getVotes();
   res.json({ votes, success: true });
+});
+
+// Reset database endpoint to clear votes (Athlete points, Fan votes and Pi collected will all start fresh at 0)
+app.all("/api/reset-database", async (req, res) => {
+  try {
+    // 1. Reset local db.json fallback
+    const freshData = { votes: [], users: [] };
+    await fs.writeFile(dbPath, JSON.stringify(freshData, null, 2), "utf-8");
+    console.log("[Database Service] Reset local db.json successfully.");
+
+    // 2. Reset Supabase database "votes" table if active
+    const supabase = getSupabaseClient();
+    if (supabase) {
+      const { error } = await supabase
+        .from("votes")
+        .delete()
+        .neq("fighter_key", "force_all_rows_delete_trick");
+      if (error) {
+        console.warn("[Database Service] Supabase tables deletion error:", error.message);
+      } else {
+        console.log("[Database Service] Reset Supabase votes table successfully.");
+      }
+    }
+
+    res.json({ success: true, message: "All points, fan votes, and Pi collected have been successfully reset to 0!" });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // Get registered users list

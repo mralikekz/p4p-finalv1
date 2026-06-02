@@ -2678,24 +2678,20 @@ const state = {
 /* ---- Pre-populate starting values locally to avoid empty scoreboard ---- */
 function initDefaultScores() {
   P4P_LIST.forEach((_, idx) => {
-    state.scores[`p4p_${idx}`] = 2000 - idx * 100;
+    state.scores[`p4p_${idx}`] = 0;
   });
   BOXING_LIST.forEach((_, idx) => {
-    state.scores[`box_${idx}`] = 3000 - idx * 80;
+    state.scores[`box_${idx}`] = 0;
   });
   WRESTLING_LIST.forEach((_, idx) => {
-    state.scores[`wrest_${idx}`] = 1500 - idx * 40;
+    state.scores[`wrest_${idx}`] = 0;
   });
   WEIGHT_CLASSES.forEach((wc) => {
     const champKey = getP4PKey(wc.champ.name);
-    if (state.scores[champKey] === undefined) {
-      state.scores[champKey] = 1200;
-    }
+    state.scores[champKey] = 0;
     wc.fighters.forEach((f, idx) => {
       const fKey = getP4PKey(f.name);
-      if (state.scores[fKey] === undefined) {
-        state.scores[fKey] = (15 - idx) * 100 + 100;
-      }
+      state.scores[fKey] = 0;
     });
   });
 }
