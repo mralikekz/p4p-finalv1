@@ -592,12 +592,37 @@ app.post("/api/complete", async (req, res) => {
 
 // Dedicated standalone routes to pass Pi Network Core Team portal moderation:
 // App's Privacy Policy URL and App's Terms of Service URL
+function servePolicyFile(res: any, fileName: string) {
+  const possiblePaths = [
+    path.join(process.cwd(), "dist", fileName),
+    path.join(process.cwd(), "dist", fileName.replace(".html", ""), "index.html"),
+    path.join(process.cwd(), "public", fileName),
+    path.join(process.cwd(), "public", fileName.replace(".html", ""), "index.html")
+  ];
+
+  async function tryNext(index: number) {
+    if (index >= possiblePaths.length) {
+      res.status(404).send(`<h1>404 Not Found</h1><p>Could not load ${fileName}. Please contact support.</p>`);
+      return;
+    }
+    const currentPath = possiblePaths[index];
+    try {
+      await fs.access(currentPath);
+      res.sendFile(currentPath);
+    } catch {
+      tryNext(index + 1);
+    }
+  }
+
+  tryNext(0);
+}
+
 app.get(["/privacy", "/privacy.html"], (req, res) => {
-  res.sendFile(path.join(process.cwd(), "public/privacy.html"));
+  servePolicyFile(res, "privacy.html");
 });
 
 app.get(["/terms", "/terms.html"], (req, res) => {
-  res.sendFile(path.join(process.cwd(), "public/terms.html"));
+  servePolicyFile(res, "terms.html");
 });
 
 async function startServer() {
