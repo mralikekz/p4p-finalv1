@@ -36,6 +36,10 @@
     {
       "source": "/terms",
       "destination": "/terms.html"
+    },
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/index.ts"
     }
   ]
 }

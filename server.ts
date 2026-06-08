@@ -1,7 +1,6 @@
 import express from "express";
 import path from "path";
 import fs from "fs/promises";
-import { createServer as createViteServer } from "vite";
 import { createClient } from "@supabase/supabase-js";
 import dotenv from "dotenv";
 
@@ -546,7 +545,11 @@ app.post("/api/verify-payment", async (req, res) => {
       });
 
       if (!response.ok) {
-        throw new Error(`Pi APIs responded with HTTP status ${response.status}`);
+        let errDesc = "";
+        try {
+          errDesc = await response.text();
+        } catch (_) {}
+        throw new Error(`Pi APIs responded with HTTP status ${response.status}${errDesc ? ': ' + errDesc : ''}`);
       }
 
       const pmtData: any = await response.json();
@@ -639,7 +642,11 @@ app.post("/api/approve", async (req, res) => {
     });
 
     if (!response.ok) {
-      throw new Error(`Pi APIs responded with HTTP status ${response.status}`);
+      let errDesc = "";
+      try {
+        errDesc = await response.text();
+      } catch (_) {}
+      throw new Error(`Pi APIs responded with HTTP status ${response.status}${errDesc ? ': ' + errDesc : ''}`);
     }
 
     res.json({ approved: true });
@@ -682,7 +689,11 @@ app.post("/api/complete", async (req, res) => {
     });
 
     if (!response.ok) {
-      throw new Error(`Pi APIs responded with HTTP status ${response.status}`);
+      let errDesc = "";
+      try {
+        errDesc = await response.text();
+      } catch (_) {}
+      throw new Error(`Pi APIs responded with HTTP status ${response.status}${errDesc ? ': ' + errDesc : ''}`);
     }
 
     res.json({ completed: true });
@@ -936,6 +947,7 @@ app.get(["/terms", "/terms.html"], (req, res) => {
 
 async function startServer() {
   if (process.env.NODE_ENV !== "production") {
+    const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
@@ -955,3 +967,5 @@ async function startServer() {
 }
 
 startServer();
+
+export default app;

@@ -2716,8 +2716,9 @@ function initDefaultScores() {
 /* =========================================================
    PI SDK INTEGRATION
    ========================================================= */
-// Automatically route API requests to live Cloud Run backend if hosted on Vercel
-var API_BASE = (window.location.hostname.indexOf('vercel.app') !== -1 || window.location.hostname.indexOf('github.io') !== -1 || window.location.href.indexOf('p4p-final') !== -1)
+// Automatically route API requests to relative /api (works on local, Vercel, and Cloud Run).
+// Fall back to Cloud Run ONLY on static github.io hosting if needed.
+var API_BASE = (window.location.hostname.indexOf('github.io') !== -1)
   ? 'https://ais-pre-o257qajz2hz4kkyzdbpemz-774972843387.europe-west2.run.app/api'
   : '/api';
 
