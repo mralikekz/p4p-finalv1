@@ -2716,11 +2716,24 @@ function initDefaultScores() {
 /* =========================================================
    PI SDK INTEGRATION
    ========================================================= */
-// Automatically route API requests to relative /api (works on local, Vercel, and Cloud Run).
-// Fall back to Cloud Run ONLY on static github.io hosting if needed.
-var API_BASE = (window.location.hostname.indexOf('github.io') !== -1)
-  ? 'https://ais-pre-o257qajz2hz4kkyzdbpemz-774972843387.europe-west2.run.app/api'
-  : '/api';
+// Automatically route API requests to responsive backend API endpoint.
+// Fall back to robust absolute Cloud Run preview domains when running inside Pi browser sandbox CDNs or GitHub static assets.
+var API_BASE = '/api';
+if (window.location.hostname && 
+    window.location.hostname !== 'localhost' && 
+    window.location.hostname !== '127.0.0.1' && 
+    window.location.hostname !== '0.0.0.0') {
+  
+  if (window.location.hostname.includes('minepi.com') || 
+      window.location.hostname.includes('pinet.com') || 
+      window.location.hostname.includes('github.io')) {
+    // If running within the Pi Sandbox CDN/portal iframe or GitHub Pages, use the absolute production clone
+    API_BASE = 'https://ais-pre-o257qajz2hz4kkyzdbpemz-774972843387.europe-west2.run.app/api';
+  } else {
+    // Otherwise route cleanly to current runtime origin + /api
+    API_BASE = window.location.origin + '/api';
+  }
+}
 
 /* ---- Load globally persisted scores from DB ---- */
 function loadVotesFromServer() {
