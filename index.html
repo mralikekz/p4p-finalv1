@@ -3655,15 +3655,23 @@ function executePiPayment(fighterName, scoreKey, division, onSuccess, onError, o
         .then(function(res) {
           if (!res.ok) {
             return res.json().then(function(err) {
-              console.error('[Pi SDK Base Error] Server rejected approve API:', err.error || 'Unknown error');
+              var errMsg = err.error || 'Unknown error';
+              console.error('[Pi SDK Base Error] Server rejected approve API:', errMsg);
+              showToast('Ошибка сервера: ' + errMsg, 'error');
+              onError('Ошибка сервера: ' + errMsg);
             }).catch(function() {
-              console.error('[Pi SDK Base Error] Server rejected approve API with status:', res.status);
+              var statusErr = 'Ошибка одобрения сервером (статус ' + res.status + ')';
+              console.error('[Pi SDK Base Error]', statusErr);
+              showToast(statusErr, 'error');
+              onError(statusErr);
             });
           }
           console.log('[Pi SDK] Server approved payment successfully:', id);
         })
         .catch(function(e) {
           console.error('[Pi SDK] Approve fetch network error:', e);
+          showToast('Сетевая ошибка при одобрении', 'error');
+          onError('Сетевая ошибка при одобрении: ' + e.message);
         });
       },
       onReadyForServerCompletion: function(id, txid) {
