@@ -40,22 +40,34 @@ function checkRateLimit(ip: string): boolean {
 }
 
 // DB helper functions for local filesystem
+let _inMemoryDB: any = null;
+
 async function readDB() {
+  if (_inMemoryDB) {
+    return _inMemoryDB;
+  }
   try {
     const data = await fs.readFile(dbPath, "utf-8");
     const parsed = JSON.parse(data);
-    return {
+    _inMemoryDB = {
       votes: parsed.votes || [],
       users: parsed.users || [],
       payouts: parsed.payouts || []
     };
+    return _inMemoryDB;
   } catch (e) {
-    return { votes: [], users: [], payouts: [] };
+    _inMemoryDB = { votes: [], users: [], payouts: [] };
+    return _inMemoryDB;
   }
 }
 
 async function writeDB(data: any) {
-  await fs.writeFile(dbPath, JSON.stringify(data, null, 2), "utf-8");
+  _inMemoryDB = data;
+  try {
+    await fs.writeFile(dbPath, JSON.stringify(data, null, 2), "utf-8");
+  } catch (err: any) {
+    console.warn("[Database Fallback] Failed writing db.json to disk (expected on read-only environments like Vercel). Operating on in-memory replica:", err.message);
+  }
 }
 
 // --- LAZY SUPABASE CLIENT INITIALIZATION ---
@@ -404,7 +416,7 @@ app.all("/api/reset-database", async (req, res) => {
   try {
     // 1. Reset local db.json fallback
     const freshData = { votes: [], users: [] };
-    await fs.writeFile(dbPath, JSON.stringify(freshData, null, 2), "utf-8");
+    await writeDB(freshData);
     console.log("[Database Service] Reset local db.json successfully.");
 
     // 2. Reset Supabase database "votes" table if active

@@ -3268,9 +3268,9 @@ async function triggerPioneerAllowAuth() {
       console.warn('[Pi] Pi.init Promise error:', e);
     }
 
-    // Inside real Pi Browser Sandbox with 'username' and 'payments' scope
-    Pi.authenticate(['username', 'payments'], handleIncompletePayment)
-    .then(function(auth) {
+    try {
+      // Inside real Pi Browser Sandbox with 'username' and 'payments' scope
+      const auth = await Pi.authenticate(['username', 'payments'], handleIncompletePayment);
       _authReady = true;
       if (auth && auth.user) {
         state.lastAuthenticatedPiUser = auth.user;
@@ -3278,12 +3278,11 @@ async function triggerPioneerAllowAuth() {
       } else {
         showToast('Pi authentication returned empty payload', 'error');
       }
-    })
-    .catch(function(err) {
+    } catch (err) {
       console.warn('[Pi SDK] Authentication declined or failed. Preserving preview sandbox flow.', err);
       // Fallback seamlessly so users can test perfectly in any browser
       proceedWithSimulatedAuth();
-    });
+    }
   } else {
     // Normal browser / preview simulation mode
     proceedWithSimulatedAuth();
