@@ -64,7 +64,7 @@ let _supabaseClient: any = null;
 function getSupabaseClient() {
   if (_supabaseClient) return _supabaseClient;
   const url = process.env.SUPABASE_URL;
-  const key = process.env.SUPABASE_ANON_KEY;
+  const key = process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_ANON;
   if (url && key) {
     try {
       _supabaseClient = createClient(url, key);
@@ -633,6 +633,7 @@ app.post("/api/approve", async (req, res) => {
   }
 
   try {
+    console.log(`[Pi API] Attempting to approve payment ${paymentId} using key starting with ${PI_API_KEY.substring(0, 5)}...`);
     const response = await fetch(`https://api.minepi.com/v2/payments/${paymentId}/approve`, {
       method: "POST",
       headers: {
@@ -646,9 +647,11 @@ app.post("/api/approve", async (req, res) => {
       try {
         errDesc = await response.text();
       } catch (_) {}
+      console.error(`[Pi API Error] Approve failed for payment ${paymentId} (Status ${response.status}): ${errDesc}`);
       throw new Error(`Pi APIs responded with HTTP status ${response.status}${errDesc ? ': ' + errDesc : ''}`);
     }
 
+    console.log(`[Pi API] Successfully approved payment ${paymentId}`);
     res.json({ approved: true });
   } catch (e: any) {
     console.error("[Pi SDK server-approval error]:", e.message);
@@ -679,6 +682,7 @@ app.post("/api/complete", async (req, res) => {
   }
 
   try {
+    console.log(`[Pi API] Attempting to complete payment ${paymentId} with transaction hash starting with ${txid.substring(0, 8)}...`);
     const response = await fetch(`https://api.minepi.com/v2/payments/${paymentId}/complete`, {
       method: "POST",
       headers: {
@@ -693,9 +697,11 @@ app.post("/api/complete", async (req, res) => {
       try {
         errDesc = await response.text();
       } catch (_) {}
+      console.error(`[Pi API Error] Complete failed for payment ${paymentId} (Status ${response.status}): ${errDesc}`);
       throw new Error(`Pi APIs responded with HTTP status ${response.status}${errDesc ? ': ' + errDesc : ''}`);
     }
 
+    console.log(`[Pi API] Successfully completed payment ${paymentId}`);
     res.json({ completed: true });
   } catch (e: any) {
     console.error("[Pi SDK server-completion error]:", e.message);
