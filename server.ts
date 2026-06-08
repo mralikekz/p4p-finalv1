@@ -506,9 +506,14 @@ app.post("/api/verify-payment", async (req, res) => {
   let validationError = "Verification failed";
 
   // If in sandbox mode or starting with demo_, simulate success
-  if (!PI_API_KEY || paymentId.startsWith("demo_") || paymentId.includes("sandbox")) {
+  if (paymentId.startsWith("demo_") || paymentId.includes("sandbox")) {
     console.log(`[Pi Sandbox Verification] Developer mode emulation for payment: ${paymentId}`);
     isPaymentValid = true;
+  } else if (!PI_API_KEY) {
+    const errorMsg = "Server error: PI_NETWORK_API_KEY / PI_API_KEY is not configured on the server, so real payment verification cannot proceed.";
+    console.error(`[Pi Config Error] ${errorMsg}`);
+    res.status(500).json({ error: errorMsg });
+    return;
   } else {
     try {
       // 1. If txid is provided, try to auto-complete the payment first on Pi Network
@@ -611,9 +616,16 @@ app.post("/api/approve", async (req, res) => {
     return;
   }
 
-  if (!PI_API_KEY || paymentId.startsWith("demo_")) {
+  if (paymentId.startsWith("demo_")) {
     console.log(`[Pi Sandbox] Approving simulated payment: ${paymentId}`);
     res.json({ approved: true });
+    return;
+  }
+
+  if (!PI_API_KEY) {
+    const errorMsg = "Server error: PI_NETWORK_API_KEY / PI_API_KEY is not configured in the backend environment. Real payments cannot be approved without this key.";
+    console.error(`[Pi Config Error]: ${errorMsg}`);
+    res.status(500).json({ error: errorMsg });
     return;
   }
 
@@ -646,9 +658,16 @@ app.post("/api/complete", async (req, res) => {
     return;
   }
 
-  if (!PI_API_KEY || paymentId.startsWith("demo_")) {
+  if (paymentId.startsWith("demo_")) {
     console.log(`[Pi Sandbox] Finalizing simulated payment: ${paymentId}`);
     res.json({ completed: true });
+    return;
+  }
+
+  if (!PI_API_KEY) {
+    const errorMsg = "Server error: PI_NETWORK_API_KEY / PI_API_KEY is not configured in the backend environment. Real payments cannot be completed without this key.";
+    console.error(`[Pi Config Error]: ${errorMsg}`);
+    res.status(500).json({ error: errorMsg });
     return;
   }
 

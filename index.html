@@ -2773,6 +2773,7 @@ function saveVoteToServer(fighterKey, fighterName, division, points, piAmount) {
 var PI_WALLET    = 'GB2YFUTVSBFPT6PPNSIEVKMHGSUAIS6X46DP6RUXFJ6FDNLFDB2X6MZ';
 var _authReady   = false;
 var _hasPayments = false; 
+var PI_SANDBOX   = !/PiBrowser/i.test(navigator.userAgent) && !window.location.href.includes('pinet.com') && !window.location.href.includes('pi-app');
 
 function handleIncompletePayment(pmt) {
   console.log('[Pi] Unresolved payment discovered:', pmt && pmt.id);
@@ -2797,8 +2798,8 @@ async function initPi() {
   
   try {
     // Treat Pi.init as a Promise and await it fully
-    await Pi.init({ version: '2.0', sandbox: true });
-    console.log('[Pi] Pi.init resolved successfully.');
+    await Pi.init({ version: '2.0', sandbox: PI_SANDBOX });
+    console.log('[Pi] Pi.init resolved successfully. Sandbox mode:', PI_SANDBOX);
   } catch (err) {
     console.warn('[Pi] Pi.init Resolution issue:', err);
   }
@@ -2837,7 +2838,7 @@ async function piPay(data, cbs) {
 
   // Ensure Pi is fully initialized
   try {
-    await Pi.init({ version: '2.0', sandbox: true });
+    await Pi.init({ version: '2.0', sandbox: PI_SANDBOX });
   } catch (initErr) {
     console.warn('[Pi] Pi.init Promise error inside piPay:', initErr);
   }
@@ -3261,7 +3262,7 @@ async function triggerPioneerAllowAuth() {
   if (typeof Pi !== 'undefined') {
     try {
       // Treat Pi.init as a Promise and await it fully
-      await Pi.init({ version: '2.0', sandbox: true });
+      await Pi.init({ version: '2.0', sandbox: PI_SANDBOX });
     } catch (e) {
       console.warn('[Pi] Pi.init Promise error:', e);
     }
@@ -3649,7 +3650,20 @@ function executePiPayment(fighterName, scoreKey, division, onSuccess, onError, o
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ paymentId: id })
-        }).catch(function(e) { console.error('[Pi SDK] Approve error:', e); });
+        })
+        .then(function(res) {
+          if (!res.ok) {
+            return res.json().then(function(err) {
+              console.error('[Pi SDK Base Error] Server rejected approve API:', err.error || 'Unknown error');
+            }).catch(function() {
+              console.error('[Pi SDK Base Error] Server rejected approve API with status:', res.status);
+            });
+          }
+          console.log('[Pi SDK] Server approved payment successfully:', id);
+        })
+        .catch(function(e) {
+          console.error('[Pi SDK] Approve fetch network error:', e);
+        });
       },
       onReadyForServerCompletion: function(id, txid) {
         console.log('[Pi SDK] Payment transaction completed:', txid);
