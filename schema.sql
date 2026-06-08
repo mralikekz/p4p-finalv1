@@ -7,6 +7,7 @@
 CREATE TABLE IF NOT EXISTS pioneers (
     username VARCHAR(100) PRIMARY KEY,
     wallet_address VARCHAR(255) DEFAULT 'Simulated Wallet Address',
+    uid VARCHAR(100) DEFAULT '',
     registered_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -42,3 +43,21 @@ VALUES
   ('alexander_volkanovski', 'Alexander Volkanovski', 'Featherweight', 1100, 11),
   ('sean_omalley', 'Sean O''Malley', 'Bantamweight', 950, 9.5)
 ON CONFLICT (fighter_key) DO NOTHING;
+
+-- 3. Payouts Table (outgoing App-to-User payouts tracking for checklists)
+CREATE TABLE IF NOT EXISTS payouts (
+    payment_id VARCHAR(100) PRIMARY KEY,
+    txid VARCHAR(255) NOT NULL,
+    recipient_uid VARCHAR(100) NOT NULL,
+    amount NUMERIC(10, 4) DEFAULT 0.0000,
+    memo VARCHAR(255) DEFAULT 'Developer test payout',
+    status VARCHAR(50) DEFAULT 'completed',
+    completed_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Enable RLS for payouts
+ALTER TABLE payouts ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Enable read/write access to payouts" ON payouts;
+CREATE POLICY "Enable read/write access to payouts" ON payouts
+    FOR ALL USING (true) WITH CHECK (true);
+

@@ -1743,6 +1743,19 @@ h1, h2, h3, .display {
 </div>
 
 <!-- ============================
+     PI MANUAL SIGN IN BANNER
+     ============================ -->
+<div id="piAuthPromptBanner" style="display: none; background: rgba(147, 51, 234, 0.12); border: 1.5px solid rgba(147, 51, 234, 0.35); border-radius: var(--radius-md); padding: 12px 18px; margin: 15px auto; max-width: 600px; align-items: center; justify-content: space-between; gap: 14px; font-size: 13px; box-shadow: 0 4px 14px rgba(147, 51, 234, 0.1); width: 90%;">
+  <div style="display: flex; align-items: center; gap: 10px; color: var(--text-h); font-weight: 500; text-align: left;">
+    <span style="font-size: 20px; text-shadow: 0 0 10px rgba(168, 85, 247, 0.6);">⚡</span>
+    <span>Please sign in with your Pi Network account to verify your session and start voting.</span>
+  </div>
+  <button onclick="triggerPioneerAllowAuth()" style="background: linear-gradient(135deg, #a855f7 0%, #6b21a8 100%); color: #fff; border: none; padding: 10px 18px; font-weight: 700; border-radius: var(--radius-sm); cursor: pointer; transition: transform 0.2s; font-family: inherit; font-size: 12px; white-space: nowrap; box-shadow: 0 4px 10px rgba(168, 85, 247, 0.35);">
+    SIGN IN WITH PI
+  </button>
+</div>
+
+<!-- ============================
      NAVIGATION
      ============================ -->
 <nav class="app-nav" role="navigation">
@@ -1921,6 +1934,8 @@ h1, h2, h3, .display {
     <button class="btn-confirm" onclick="closeMmaVideos()" style="width: 100%;" data-i18n="btnClose">CLOSE</button>
   </div>
 </div>
+
+
 
 <!-- ============================
      REGISTER / LOGIN AUTH MODAL (Pi Browser Auth Clone)
@@ -2260,6 +2275,7 @@ const EXTRA_GLOSSARY = {
     flyweight: "Flyweight", bantamweight: "Bantamweight", featherweight: "Featherweight", lightweight: "Lightweight",
     welterweight: "Welterweight", middleweight: "Middleweight", lightheavyweight: "Light Heavyweight", heavyweight: "Heavyweight",
     settings: "Settings", login: "Login", pioneerrating: "Pioneer",
+    settingsTitle: "APPLICATION CONFIGURATION", btnClose: "CLOSE",
     sportmma: "MMA", sportbox: "BOXING", sportwrestling: "WRESTLING",
     boxp4psec: "Top 30 Greatest Boxers in History · Fan Vote Leaderboard",
     wrestp4psec: "Freestyle Wrestling Top 30 · Fan Vote Leaderboard"
@@ -2269,6 +2285,7 @@ const EXTRA_GLOSSARY = {
     flyweight: "Наилегчайший вес", bantamweight: "Легчайший вес", featherweight: "Полулегкий вес", lightweight: "Легкий вес",
     welterweight: "Полусредний вес", middleweight: "Средний вес", lightheavyweight: "Полутяжелый вес", heavyweight: "Тяжелый вес",
     settings: "Настройки", login: "Вход", pioneerrating: "Пионер",
+    settingsTitle: "НАСТРОЙКИ ПРИЛОЖЕНИЯ", btnClose: "ЗАКРЫТЬ",
     sportmma: "MMA", sportbox: "БОКС", sportwrestling: "БОРЬБА",
     boxp4psec: "Топ-30 величайших боксеров в истории · Фанатский рейтинг",
     wrestp4psec: "Вольная борьба ТОП-30 · Фанатский рейтинг"
@@ -2757,46 +2774,52 @@ var PI_WALLET    = 'GCXCW4REFA6PMYKOOI5N7F53P4HJR2SETBIOVTVH3ZAFFG35G47OMTWG';
 var _authReady   = false;
 var _hasPayments = false; 
 
-function initPi() {
+async function initPi() {
   if (typeof Pi === 'undefined') {
     _authReady   = true;
     _hasPayments = true; // demo execution fallback
     console.warn('[Pi] Running outside Pi Browser - Sandbox simulator enabled');
     return;
   }
-  Pi.init({ version: '2.0', sandbox: true });
+  
+  try {
+    // Treat Pi.init as a Promise and await it fully
+    await Pi.init({ version: '2.0', sandbox: true });
+    console.log('[Pi] Pi.init resolved successfully.');
+  } catch (err) {
+    console.warn('[Pi] Pi.init Resolution issue:', err);
+  }
 
-  Pi.authenticate(
-    ['username', 'payments'],
-    function onIncompletePaymentFound(pmt) {
-      console.log('[Pi] Unresolved payment discovered:', pmt && pmt.id);
-      if (pmt && pmt.identifier) {
-        fetch(API_BASE + '/complete', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ paymentId: pmt.identifier, txid: pmt.transaction && pmt.transaction.txid || 'unknown' })
-        }).catch(function(){});
-      }
+  const handleIncompletePayment = function(pmt) {
+    console.log('[Pi] Unresolved payment discovered:', pmt && pmt.id);
+    if (pmt && pmt.identifier) {
+      fetch(API_BASE + '/complete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paymentId: pmt.identifier, txid: pmt.transaction && pmt.transaction.txid || 'unknown' })
+      }).catch(function(){});
     }
-  )
-  .then(function(auth) {
+  };
+
+  try {
+    // Authenticate automatically with 'username' scope
+    const auth = await Pi.authenticate(['username'], handleIncompletePayment);
     _authReady   = true;
     _hasPayments = !!(auth && auth.accessToken);
     state.piReady = true;
     if (auth && auth.user) {
       state.lastAuthenticatedPiUser = auth.user;
       console.log('[Pi SDK] Auto-detected Pioneer user:', auth.user.username);
-      // Try to register seamlessly without flashing alerts on start
-      registerUserOnBackend(auth.user.username, '', false);
+      // Send the returned access token to the backend for verification
+      registerUserOnBackendWithToken(auth.user.username, auth.accessToken, auth.user.uid, false);
     }
-    console.log('[Pi] Success authenticating. Payments support unlocked: ', _hasPayments);
-  })
-  .catch(function(err) {
+    console.log('[Pi] Success authenticating automatically. Active session unlocked: ', _hasPayments);
+  } catch (err) {
     _authReady   = true;
     _hasPayments = false;
     state.piReady = true;
-    console.warn('[Pi] Authentication error:', err);
-  });
+    console.warn('[Pi] Auto-authentication failed:', err);
+  }
 }
 
 function piPay(data, cbs) {
@@ -3225,18 +3248,24 @@ function toggleSimOpts() {
   }
 }
 
-function triggerPioneerAllowAuth() {
+async function triggerPioneerAllowAuth() {
   if (typeof Pi !== 'undefined') {
-    // Inside real Pi Browser Sandbox (step 10 developer checklist compliance)
-    Pi.authenticate(['username', 'payments'], function(pmt) {
+    try {
+      // Treat Pi.init as a Promise and await it fully
+      await Pi.init({ version: '2.0', sandbox: true });
+    } catch (e) {
+      console.warn('[Pi] Pi.init Promise error:', e);
+    }
+
+    // Inside real Pi Browser Sandbox with 'username' scope
+    Pi.authenticate(['username'], function(pmt) {
       console.log('[Pi SDK] Incomplete payment verify:', pmt);
     })
     .then(function(auth) {
       _authReady = true;
       if (auth && auth.user) {
         state.lastAuthenticatedPiUser = auth.user;
-        const customWallet = document.getElementById('authWalletInput').value.trim();
-        registerUserOnBackend(auth.user.username, customWallet || '', true);
+        registerUserOnBackendWithToken(auth.user.username, auth.accessToken, auth.user.uid, true);
       } else {
         showToast('Pi authentication returned empty payload', 'error');
       }
@@ -3264,14 +3293,46 @@ function proceedWithSimulatedAuth() {
     return;
   }
   
-  registerUserOnBackend(username, wallet, true);
+  let simulatedUid = 'demo-uid-' + username.replace('@', '').toLowerCase() + '-' + Math.random().toString(36).substring(2, 8);
+  registerUserOnBackend(username, wallet, true, simulatedUid);
 }
 
-function registerUserOnBackend(username, walletAddress, showAlert) {
+function registerUserOnBackendWithToken(username, accessToken, uid, showAlert) {
   fetch(API_BASE + '/register', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username: username, walletAddress: walletAddress })
+    body: JSON.stringify({ username: username, uid: uid || '', accessToken: accessToken })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    if (data && data.success) {
+      state.currentUser = data.user;
+      localStorage.setItem('p4p_user', JSON.stringify(data.user));
+      updateLoginButtonUI();
+      closeAuthModal();
+      
+      if (showAlert) {
+        showToast((T('loginSuccessToast') || 'Logged in successfully as') + ': ' + data.user.username, 'success');
+      }
+    } else {
+      if (showAlert) {
+        showToast('Pi token authorization failed: ' + (data.error || 'Server error'), 'error');
+      }
+    }
+  })
+  .catch(function(err) {
+    console.error('[Auth Token Service] Backend error:', err);
+    if (showAlert) {
+      showToast('Backend connection error when checking token.', 'error');
+    }
+  });
+}
+
+function registerUserOnBackend(username, walletAddress, showAlert, uid) {
+  fetch(API_BASE + '/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username: username, walletAddress: walletAddress, uid: uid || '' })
   })
   .then(function(r) { return r.json(); })
   .then(function(data) {
@@ -3295,7 +3356,7 @@ function registerUserOnBackend(username, walletAddress, showAlert) {
     if (showAlert) {
       showToast('Offline fallback: Registered locally.', 'success');
       // Save locally to keep UX smooth if server connection drops
-      const fallbackUser = { username: username, walletAddress: walletAddress || 'Local Address', registeredAt: new Date().toISOString() };
+      const fallbackUser = { username: username, walletAddress: walletAddress || 'Local Address', registeredAt: new Date().toISOString(), uid: uid || '' };
       state.currentUser = fallbackUser;
       localStorage.setItem('p4p_user', JSON.stringify(fallbackUser));
       updateLoginButtonUI();
@@ -3306,6 +3367,11 @@ function registerUserOnBackend(username, walletAddress, showAlert) {
 
 function updateLoginButtonUI() {
   const btn = document.getElementById('loginNavBtn');
+  const banner = document.getElementById('piAuthPromptBanner');
+  if (banner) {
+    banner.style.display = state.currentUser ? 'none' : 'flex';
+  }
+  
   if (!btn) return;
   
   if (state.currentUser) {
@@ -3653,11 +3719,11 @@ function init() {
   if (savedUser) {
     try {
       state.currentUser = JSON.parse(savedUser);
-      updateLoginButtonUI();
     } catch(e) {
       console.warn('Could not parse saved user:', e);
     }
   }
+  updateLoginButtonUI();
 
   // Sync state points from DB
   loadVotesFromServer();

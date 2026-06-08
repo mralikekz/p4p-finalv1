@@ -18,6 +18,7 @@ interface Pioneer {
   username: string;
   walletAddress: string;
   registeredAt: string;
+  uid?: string;
 }
 
 interface VoteEntry {
@@ -43,10 +44,11 @@ async function readDB() {
     const parsed = JSON.parse(data);
     return {
       votes: parsed.votes || [],
-      users: parsed.users || []
+      users: parsed.users || [],
+      payouts: parsed.payouts || []
     };
   } catch (e) {
-    return { votes: [], users: [] };
+    return { votes: [], users: [], payouts: [] };
   }
 }
 
@@ -119,7 +121,8 @@ async function getUsers(): Promise<Pioneer[]> {
         return data.map((p: any) => ({
           username: p.username,
           walletAddress: p.wallet_address || "Simulated Wallet Address",
-          registeredAt: p.registered_at || new Date().toISOString()
+          registeredAt: p.registered_at || new Date().toISOString(),
+          uid: p.uid || ""
         }));
       }
     } catch (err: any) {
@@ -133,15 +136,16 @@ async function getUsers(): Promise<Pioneer[]> {
   
   // Local fallback
   const local = await readDB();
-  return local.users || [];
+  return (local as any).users || [];
 }
 
-async function registerUser(username: string, walletAddress: string): Promise<Pioneer> {
+async function registerUser(username: string, walletAddress: string, uid?: string): Promise<Pioneer> {
   let cleanUsername = username.trim();
   if (!cleanUsername.startsWith("@")) {
     cleanUsername = "@" + cleanUsername;
   }
   let cleanWallet = (walletAddress || "").trim() || "Simulated Wallet Address";
+  let cleanUid = (uid || "").trim();
   
   const supabase = getSupabaseClient();
   if (supabase) {
@@ -155,10 +159,22 @@ async function registerUser(username: string, walletAddress: string): Promise<Pi
       if (findError) throw findError;
       
       if (existing) {
+        let needsUpdate = false;
+        const updateFields: any = {};
+        
         if (cleanWallet !== "Simulated Wallet Address" && (!existing.wallet_address || existing.wallet_address === "Simulated Wallet Address")) {
+          updateFields.wallet_address = cleanWallet;
+          needsUpdate = true;
+        }
+        if (cleanUid && (!existing.uid || existing.uid !== cleanUid)) {
+          updateFields.uid = cleanUid;
+          needsUpdate = true;
+        }
+
+        if (needsUpdate) {
           const { data: updated, error: updateError } = await supabase
             .from("pioneers")
-            .update({ wallet_address: cleanWallet })
+            .update(updateFields)
             .eq("username", cleanUsername)
             .select()
             .single();
@@ -166,19 +182,22 @@ async function registerUser(username: string, walletAddress: string): Promise<Pi
           return {
             username: updated.username,
             walletAddress: updated.wallet_address,
-            registeredAt: updated.registered_at
+            registeredAt: updated.registered_at,
+            uid: updated.uid
           };
         }
         return {
           username: existing.username,
           walletAddress: existing.wallet_address,
-          registeredAt: existing.registered_at
+          registeredAt: existing.registered_at,
+          uid: existing.uid
         };
       }
       
       const userToInsert = {
         username: cleanUsername,
         wallet_address: cleanWallet,
+        uid: cleanUid,
         registered_at: new Date().toISOString()
       };
       
@@ -192,7 +211,8 @@ async function registerUser(username: string, walletAddress: string): Promise<Pi
       return {
         username: created.username,
         walletAddress: created.wallet_address,
-        registeredAt: created.registered_at
+        registeredAt: created.registered_at,
+        uid: created.uid
       };
     } catch (err: any) {
       if (err.message && err.message.includes("Could not find the table")) {
@@ -212,8 +232,16 @@ async function registerUser(username: string, walletAddress: string): Promise<Pi
   );
   
   if (localExisting) {
+    let localUpdated = false;
     if (cleanWallet !== "Simulated Wallet Address" && (!localExisting.walletAddress || localExisting.walletAddress === "Simulated Wallet Address")) {
       localExisting.walletAddress = cleanWallet;
+      localUpdated = true;
+    }
+    if (cleanUid && (!localExisting.uid || localExisting.uid !== cleanUid)) {
+      localExisting.uid = cleanUid;
+      localUpdated = true;
+    }
+    if (localUpdated) {
       await writeDB(dbData);
     }
     return localExisting;
@@ -222,7 +250,8 @@ async function registerUser(username: string, walletAddress: string): Promise<Pi
   const newUser = {
     username: cleanUsername,
     walletAddress: cleanWallet,
-    registeredAt: new Date().toISOString()
+    registeredAt: new Date().toISOString(),
+    uid: cleanUid
   };
   
   dbData.users.push(newUser);
@@ -397,7 +426,35 @@ app.get("/api/users", async (req, res) => {
 
 // Register or Login a Pioneer
 app.post("/api/register", async (req, res) => {
-  const { username, walletAddress } = req.body;
+  let { username, walletAddress, uid, accessToken } = req.body;
+
+  if (accessToken) {
+    console.log("[Pi Network backend auth] Validating access token with api.minepi.com...");
+    try {
+      const response = await fetch("https://api.minepi.com/v2/me", {
+        headers: {
+          "Authorization": `Bearer ${accessToken}`
+        }
+      });
+      if (!response.ok) {
+        console.warn("[Pi Network backend auth] Verification failed with status code " + response.status);
+        res.status(401).json({ error: "Invalid Pi Network access token from minepi.com" });
+        return;
+      }
+      const piMe = await response.json() as { uid: string; username: string };
+      if (!piMe || !piMe.username) {
+        res.status(401).json({ error: "Could not parse user information from Pi Network" });
+        return;
+      }
+      console.log(`[Pi Network backend auth] Successfully validated token for @${piMe.username} (${piMe.uid})`);
+      username = piMe.username;
+      uid = piMe.uid;
+    } catch (apiErr: any) {
+      console.error("[Pi Auth Error] Failed verifying token:", apiErr.message);
+      res.status(401).json({ error: "Pi authentication failed: " + apiErr.message });
+      return;
+    }
+  }
 
   if (!username) {
     res.status(400).json({ error: "Username is required" });
@@ -405,7 +462,7 @@ app.post("/api/register", async (req, res) => {
   }
 
   try {
-    const user = await registerUser(username, walletAddress);
+    const user = await registerUser(username, walletAddress || "", uid || "");
     res.status(200).json({ success: true, user, status: "registered" });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
@@ -603,6 +660,213 @@ app.post("/api/complete", async (req, res) => {
   } catch (e: any) {
     console.error("[Pi SDK server-completion error]:", e.message);
     res.status(500).json({ error: `Integration error on Pi completion: ${e.message}` });
+  }
+});
+
+// --- PAYOUT UTILITIES & ENDPOINTS (Pi Checklist Step 10 compliance) ---
+async function getPayouts(): Promise<any[]> {
+  const supabase = getSupabaseClient();
+  if (supabase) {
+    try {
+      const { data, error } = await supabase
+        .from("payouts")
+        .select("*")
+        .order("completed_at", { ascending: false });
+      if (error) throw error;
+      if (data) {
+        return data.map((p: any) => ({
+          paymentId: p.payment_id,
+          txid: p.txid,
+          recipientUid: p.recipient_uid,
+          amount: Number(p.amount) || 0,
+          memo: p.memo,
+          status: p.status,
+          completedAt: p.completed_at
+        }));
+      }
+    } catch (err: any) {
+      if (err.message && err.message.includes("Could not find the table")) {
+        console.warn("[Database Service] 'payouts' table not found in Supabase. Falling back smoothly to local db.json.");
+      } else {
+        console.warn("[Database Service] Failed to fetch payouts from Supabase:", err.message);
+      }
+    }
+  }
+
+  // Local fallback
+  const local = await readDB();
+  return (local as any).payouts || [];
+}
+
+async function savePayoutToDB(payout: any): Promise<void> {
+  const supabase = getSupabaseClient();
+  if (supabase) {
+    try {
+      const { error } = await supabase
+        .from("payouts")
+        .insert({
+          payment_id: payout.paymentId,
+          txid: payout.txid,
+          recipient_uid: payout.recipientUid,
+          amount: payout.amount,
+          memo: payout.memo,
+          status: payout.status,
+          completed_at: payout.completedAt
+        });
+      if (!error) {
+        console.log("[Database Service] Payout stored successfully in Supabase.");
+        return;
+      }
+      throw error;
+    } catch (err: any) {
+      console.warn("[Database Service] Supabase store payout error, saving to db.json fallback:", err.message);
+    }
+  }
+
+  // Local fallback
+  const dbData = await readDB() as any;
+  if (!dbData.payouts) dbData.payouts = [];
+  dbData.payouts.push(payout);
+  await writeDB(dbData);
+  console.log("[Database Service] Payout stored successfully in local db.json.");
+}
+
+// Endpoint to list payouts history
+app.get("/api/payouts", async (req, res) => {
+  try {
+    const payouts = await getPayouts();
+    res.json({ success: true, payouts });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Endpoint to execute App-to-User payouts directly from backend
+app.post("/api/payout", async (req, res) => {
+  const { uid, amount, memo } = req.body;
+
+  if (!uid || !amount) {
+    res.status(400).json({ error: "uid and amount are required parameters" });
+    return;
+  }
+
+  // Simulation mode fallback
+  if (!PI_API_KEY || uid.startsWith("demo_") || uid.includes("sandbox")) {
+    console.log(`[Pi Sandbox Payout] Simulating payout of ${amount} to uid: ${uid}`);
+    const mockTxid = "GAUX" + Math.random().toString(36).substring(2, 10).toUpperCase() + "SIMULATEDPAYOUT";
+    const mockPaymentId = "payout_" + Math.random().toString(36).substring(2, 12);
+    
+    const mockPayout = {
+      paymentId: mockPaymentId,
+      txid: mockTxid,
+      recipientUid: uid,
+      amount: Number(amount),
+      memo: memo || "Developer test payout",
+      status: "completed",
+      completedAt: new Date().toISOString()
+    };
+
+    try {
+      await savePayoutToDB(mockPayout);
+      res.json({
+        success: true,
+        paymentId: mockPaymentId,
+        txid: mockTxid,
+        state: "completed",
+        message: "Sandbox payout simulated and cached successfully!"
+      });
+    } catch (saveErr: any) {
+      res.status(500).json({ error: `Simulated payout saved failed: ${saveErr.message}` });
+    }
+    return;
+  }
+
+  try {
+    console.log(`[Payout API] POST /v2/payments for payout amount: ${amount}, uid: ${uid}`);
+    
+    // Step 1: Create the payment on Pi Platform Server
+    const createResponse = await fetch("https://api.minepi.com/v2/payments", {
+      method: "POST",
+      headers: {
+        "Authorization": `Key ${PI_API_KEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        payment: {
+          amount: Number(amount),
+          memo: memo || "Developer test payout",
+          metadata: { direction: "app_to_user" },
+          uid: uid
+        }
+      })
+    });
+
+    if (!createResponse.ok) {
+      const errText = await createResponse.text();
+      throw new Error(`Pi APIs creation failed (status ${createResponse.status}): ${errText}`);
+    }
+
+    const pmtData: any = await createResponse.json();
+    const paymentId = pmtData.id;
+    console.log(`[Payout API] Payout created. ID: ${paymentId}. Approving next...`);
+
+    // Step 2: Server-Side Approval
+    const approveResponse = await fetch(`https://api.minepi.com/v2/payments/${paymentId}/approve`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Key ${PI_API_KEY}`,
+        "Content-Type": "application/json"
+      }
+    });
+
+    if (!approveResponse.ok) {
+      const errText = await approveResponse.text();
+      throw new Error(`Pi APIs approval failed (status ${approveResponse.status}): ${errText}`);
+    }
+    console.log(`[Payout API] Payout Approved. Completing/Submitting next...`);
+
+    // Step 3: Server-Side Completion (triggers blockchain transaction)
+    const completeResponse = await fetch(`https://api.minepi.com/v2/payments/${paymentId}/complete`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Key ${PI_API_KEY}`,
+        "Content-Type": "application/json"
+      }
+    });
+
+    if (!completeResponse.ok) {
+      const errText = await completeResponse.text();
+      throw new Error(`Pi APIs completion failed (status ${completeResponse.status}): ${errText}`);
+    }
+
+    const completeData: any = await completeResponse.json();
+    const txid = completeData.transaction?.txid || completeData.txid || "payout_blockchain_txid";
+    console.log(`[Payout API] Completed. Transaction TxID: ${txid}`);
+
+    // Save payout details in the database
+    const payoutRecord = {
+      paymentId: paymentId,
+      txid: txid,
+      recipientUid: uid,
+      amount: Number(amount),
+      memo: memo || "Developer test payout",
+      status: "completed",
+      completedAt: new Date().toISOString()
+    };
+
+    await savePayoutToDB(payoutRecord);
+
+    res.json({
+      success: true,
+      paymentId: paymentId,
+      txid: txid,
+      state: "completed",
+      message: "App-to-User Payout completed and verified in sandbox blockchain!"
+    });
+
+  } catch (error: any) {
+    console.error("[Payout API Failure]:", error.message);
+    res.status(500).json({ error: error.message });
   }
 });
 
