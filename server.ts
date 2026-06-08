@@ -366,8 +366,8 @@ app.use((req, res, next) => {
 });
 
 // Main official wallet address and API key from environment
-const DEVELOPER_WALLET_ADDRESS = process.env.DEVELOPER_WALLET_ADDRESS || process.env.DEVELOPER_WALLET || "GCXCW4REFA6PMYKOOI5N7F53P4HJR2SETBIOVTVH3ZAFFG35G47OMTWG";
-const PI_API_KEY = process.env.PI_API_KEY || "";
+const DEVELOPER_WALLET_ADDRESS = process.env.DEVELOPER_WALLET_ADDRESS || process.env.DEVELOPER_WALLET || "GB2YFUTVSBFPT6PPNSIEVKMHGSUAIS6X46DP6RUXFJ6FDNLFDB2X6MZ";
+const PI_API_KEY = process.env.PI_NETWORK_API_KEY || process.env.PI_API_KEY || "";
 
 // Serve the Pi validation-key.txt at the root
 app.get("/validation-key.txt", async (req, res) => {
@@ -377,6 +377,13 @@ app.get("/validation-key.txt", async (req, res) => {
   } catch (err: any) {
     res.status(404).send("File not found");
   }
+});
+
+// App configuration endpoint (serves the backend's configured wallet address to avoid hardcodings)
+app.get("/api/config", (req, res) => {
+  res.json({
+    developerWalletAddress: DEVELOPER_WALLET_ADDRESS
+  });
 });
 
 // API endpoints

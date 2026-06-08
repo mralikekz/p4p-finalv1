@@ -1821,7 +1821,7 @@ h1, h2, h3, .display {
 
     <div class="wallet-note">
       <span data-i18n="walletNote">1 Pi is sent to the organizer's Pi wallet:</span>
-      <div class="wallet-addr">GCXCW4REFA6PMYKOOI5N7F53P4HJR2SETBIOVTVH3ZAFFG35G47OMTWG</div>
+      <div class="wallet-addr">GB2YFUTVSBFPT6PPNSIEVKMHGSUAIS6X46DP6RUXFJ6FDNLFDB2X6MZ</div>
     </div>
 
     <button class="btn-confirm" id="confirmBtn" onclick="confirmVote()" data-i18n="confirmVote">
@@ -2770,9 +2770,22 @@ function saveVoteToServer(fighterKey, fighterName, division, points, piAmount) {
   }).catch(function(e) { console.warn('[DB] Could not save vote to server:', e.message); });
 }
 
-var PI_WALLET    = 'GCXCW4REFA6PMYKOOI5N7F53P4HJR2SETBIOVTVH3ZAFFG35G47OMTWG';
+var PI_WALLET    = 'GB2YFUTVSBFPT6PPNSIEVKMHGSUAIS6X46DP6RUXFJ6FDNLFDB2X6MZ';
 var _authReady   = false;
 var _hasPayments = false; 
+
+function handleIncompletePayment(pmt) {
+  console.log('[Pi] Unresolved payment discovered:', pmt && pmt.id);
+  if (pmt && pmt.identifier) {
+    fetch(API_BASE + '/complete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ paymentId: pmt.identifier, txid: pmt.transaction && pmt.transaction.txid || 'unknown' })
+    }).catch(function(err){
+      console.warn('[Pi Link Complete] Incomplete payment correction non-blocking error:', err);
+    });
+  }
+}
 
 async function initPi() {
   if (typeof Pi === 'undefined') {
@@ -2790,20 +2803,9 @@ async function initPi() {
     console.warn('[Pi] Pi.init Resolution issue:', err);
   }
 
-  const handleIncompletePayment = function(pmt) {
-    console.log('[Pi] Unresolved payment discovered:', pmt && pmt.id);
-    if (pmt && pmt.identifier) {
-      fetch(API_BASE + '/complete', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ paymentId: pmt.identifier, txid: pmt.transaction && pmt.transaction.txid || 'unknown' })
-      }).catch(function(){});
-    }
-  };
-
   try {
-    // Authenticate automatically with 'username' scope
-    const auth = await Pi.authenticate(['username'], handleIncompletePayment);
+    // Authenticate automatically with 'username' and 'payments' scope
+    const auth = await Pi.authenticate(['username', 'payments'], handleIncompletePayment);
     _authReady   = true;
     _hasPayments = !!(auth && auth.accessToken);
     state.piReady = true;
@@ -2822,7 +2824,7 @@ async function initPi() {
   }
 }
 
-function piPay(data, cbs) {
+async function piPay(data, cbs) {
   // If we are running in a regular browser (outside Pi Browser) or during development/testing
   var isPiBrowser = /PiBrowser/i.test(navigator.userAgent) || window.location.href.includes('pi-app') || (typeof window.Pi !== 'undefined' && _hasPayments);
   
@@ -2833,8 +2835,15 @@ function piPay(data, cbs) {
     return;
   }
 
+  // Ensure Pi is fully initialized
+  try {
+    await Pi.init({ version: '2.0', sandbox: true });
+  } catch (initErr) {
+    console.warn('[Pi] Pi.init Promise error inside piPay:', initErr);
+  }
+
   if (!_hasPayments) {
-    Pi.authenticate(['username', 'payments'], function(){})
+    Pi.authenticate(['username', 'payments'], handleIncompletePayment)
     .then(function(auth) {
       _hasPayments = !!(auth && auth.accessToken);
       if (_hasPayments) {
@@ -3257,10 +3266,8 @@ async function triggerPioneerAllowAuth() {
       console.warn('[Pi] Pi.init Promise error:', e);
     }
 
-    // Inside real Pi Browser Sandbox with 'username' scope
-    Pi.authenticate(['username'], function(pmt) {
-      console.log('[Pi SDK] Incomplete payment verify:', pmt);
-    })
+    // Inside real Pi Browser Sandbox with 'username' and 'payments' scope
+    Pi.authenticate(['username', 'payments'], handleIncompletePayment)
     .then(function(auth) {
       _authReady = true;
       if (auth && auth.user) {
@@ -3713,6 +3720,24 @@ function init() {
   const savedLang = localStorage.getItem('p4p_lang') || 'en';
   document.getElementById('langSel').value = savedLang;
   setLang(savedLang);
+
+  // Fetch verified configuration values dynamically from backend (e.g. current wallet address)
+  fetch(API_BASE + '/config')
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data && data.developerWalletAddress) {
+        PI_WALLET = data.developerWalletAddress;
+        console.log('[Pi Config] Successfully synced dynamic developer wallet address:', PI_WALLET);
+        // Sync any HTML elements showing the destination address
+        var walletEl = document.querySelector('.wallet-addr');
+        if (walletEl) {
+          walletEl.textContent = PI_WALLET;
+        }
+      }
+    })
+    .catch(function(e) {
+      console.warn('[Pi Config Sync] Config api fetch errored, falling back onto static constant:', e);
+    });
 
   // Load saved user from local storage
   const savedUser = localStorage.getItem('p4p_user');
