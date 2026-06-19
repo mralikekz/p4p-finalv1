@@ -1,0 +1,171 @@
+
+==== Flyweight ====
+thRank th ISO thFighter thRecord th M thWin streak thLast fight thNext fight
+thResult thEvent thOpponent thRef. thEvent thOpponent thRef.
+th C td td Joshua Van td17–2 td td7 (1 def) td Win td UFC 328 td Tatsuro Taira td &#91; 107 &#93; td TBD td
+th1 td td Alexandre Pantoja td30–6 td td0 td Loss td UFC 323 td Joshua Van td &#91; 108 &#93; tdTBD td
+th2 td td Manel Kape td22–7 td td3 td Win td UFC on ESPN 73 td Brandon Royval td &#91; 109 &#93; td UFC Fight Night 279 td Kyoji Horiguchi td &#91; 110 &#93;
+th3 td td Tatsuro Taira td18–2 td td0 td Loss td UFC 328 td Joshua Van td &#91; 107 &#93; tdTBD td
+th4 td td Brandon Royval td17–9 td td0 td Loss td UFC on ESPN 73 td Manel Kape td &#91; 109 &#93; td UFC 329 td Lone'er Kavanagh td &#91; 111 &#93;
+th5 td td Kyoji Horiguchi td36–5 (1 NC) td td5 td Win td UFC Fight Night 266 td Amir Albazi td &#91; 112 &#93; td UFC Fight Night 279 td Manel Kape td &#91; 110 &#93;
+th6 td td Lone'er Kavanagh td10–1 td td1 td Win td UFC Fight Night 268 td Brandon Moreno td &#91; 113 &#93; td UFC 329 td Brandon Royval td &#91; 111 &#93;
+th7 td td Amir Albazi td17–3 td td0 td Loss td UFC Fight Night 266 td Kyoji Horiguchi td &#91; 112 &#93; tdTBD td
+th8 td td Asu Almabayev td23–3 td td2 td Win td UFC Fight Night 265 td Alex Perez td &#91; 114 &#93; td UFC Fight Night 280 td Charles Johnson td &#91; 115 &#93;
+th9 td td Brandon Moreno td23–10–2 td td0 td Loss td UFC Fight Night 268 td Lone'er Kavanagh td &#91; 113 &#93; tdTBD td
+th10 td td Steve Erceg td14–4 td td2 td Win td UFC Fight Night 275 td Tim Elliott td &#91; 116 &#93; td UFC Fight Night 282 tdRamazan Temirov td &#91; 117 &#93;
+th11 td td Alex Perez td26–10 (1 NC) td td0 td NC td UFC Fight Night 277 td Su Mudaerji td &#91; 118 &#93; tdTBD td
+th12 td td Tim Elliott td 21–14–1 td td0 td Loss td UFC Fight Night 275 td Steve Erceg td &#91; 116 &#93; tdTBD td
+th13 td td Tagir Ulanbekov td17–3 td td0 td Loss td UFC Fight Night 265 td Kyoji Horiguchi td &#91; 119 &#93; tdTBD td
+th14 td td Charles Johnson td19–8 td td1 td Win td UFC Fight Night 269 td Bruno Gustavo da Silva td &#91; 120 &#93; td UFC Fight Night 280 td Asu Almabayev td &#91; 115 &#93;
+
+==== Bantamweight ====
+thRank th ISO thFighter thRecord th M thWin streak thLast fight thNext fight
+thResult thEvent thOpponent thRef. thEvent thOpponent thRef.
+th C td td Petr Yan td20–5 td td4 (0 def) td Win td UFC 323 td Merab Dvalishvili td &#91; 94 &#93; td TBD td
+th1 td td Merab Dvalishvili td21–5 td td0 td Loss td UFC 323 td Petr Yan td &#91; 94 &#93; tdTBD td
+th2 td td Sean O'Malley td20–3 (1 NC) td  +1 td2 td Win td UFC Freedom 250 td Aiemann Zahabi td &#91; 95 &#93; tdTBD td
+th3 td td Umar Nurmagomedov td20–1 td  −1 td2 td Win td UFC 324 td Deiveson Figueiredo td &#91; 96 &#93; td UFC Fight Night 282 td David Martínez td &#91; 97 &#93;
+th4 td td Cory Sandhagen td18–6 td td0 td Loss td UFC 320 td Merab Dvalishvili td &#91; 98 &#93; td UFC 329 td Mario Bautista td &#91; 99 &#93;
+th5 td td Song Yadong td23–8–1 (1 NC) td td1 td Win td UFC Fight Night 277 td Deiveson Figueiredo td &#91; 100 &#93; tdTBD td
+th6 td td Aiemann Zahabi td14–3 td td0 td Loss td UFC Freedom 250 td Sean O'Malley td &#91; 95 &#93; tdTBD td
+th7 td td Mario Bautista td17–3 td td1 td Win td UFC Fight Night 266 td Vinicius Oliveira td &#91; 101 &#93; td UFC 329 td Cory Sandhagen td &#91; 99 &#93;
+th8 td td David Martínez td14–1 td td10 td Win td UFC Fight Night 268 td Marlon Vera td &#91; 102 &#93; td UFC Fight Night 282 td Umar Nurmagomedov td &#91; 97 &#93;
+th9 td td Deiveson Figueiredo td25–7–1 td td0 td Loss td UFC Fight Night 277 td Song Yadong td &#91; 100 &#93; tdTBD td
+th10 td td Marlon Vera td 23–12–1 td td0 td Loss td UFC Fight Night 268 td David Martínez td &#91; 102 &#93; tdTBD td
+th11 td td Payton Talbott td11–1 td td2 td Win td UFC 323 td Henry Cejudo td &#91; 103 &#93; tdTBD td
+th12 td td Vinicius Oliveira td23–4 td td0 td Loss td UFC Fight Night 266 td Mario Bautista td &#91; 101 &#93; tdTBD td
+th13 td td Raul Rosas Jr. td12–1 td td5 td Win td UFC 326 td Rob Font td &#91; 104 &#93; tdTBD td
+th14 td td Raoni Barcelos td22–5 td td5 td Win td UFC Fight Night 274 td Montel Jackson td &#91; 105 &#93; tdTBD td
+
+==== Featherweight ====
+thRank th ISO thFighter thRecord th M thWin streak thLast fight thNext fight
+thResult thEvent thOpponent thRef. thEvent thOpponent thRef.
+th C td td Alexander Volkanovski td28–4 td td2 (1 def) td Win td UFC 325 td Diego Lopes td &#91; 82 &#93; td TBD td
+th1 td td Movsar Evloev td20–0 td td20 td Win td UFC Fight Night 270 td Lerone Murphy td &#91; 83 &#93; tdTBD td
+th2 td td Diego Lopes td28–8 td td1 td Win td UFC Freedom 250 td Steve Garcia td &#91; 84 &#93; tdTBD td
+th3 td td Lerone Murphy td17–1–1 td td0 td Loss td UFC Fight Night 270 td Movsar Evloev td &#91; 83 &#93; tdTBD td
+th4 td td Aljamain Sterling td26–5 td td2 td Win td UFC Fight Night 274 td Youssef Zalal td &#91; 85 &#93; tdTBD td
+th5 td td Yair Rodríguez td20–5 (1 NC) td td1 td Win td UFC 314 td Patrício Pitbull td &#91; 86 &#93; tdTBD td
+th6 td td Jean Silva td17–3 td td1 td Win td UFC 324 td Arnold Allen td &#91; 87 &#93; tdTBD td
+th7 td td Arnold Allen td21–4 td td1 td Win td UFC Fight Night 276 td Melquizael Costa td &#91; 88 &#93; tdTBD td
+th8 td td Youssef Zalal td18–6–1 td td0 td Loss td UFC Fight Night 274 td Aljamain Sterling td &#91; 85 &#93; tdTBD td
+th9 td td Kevin Vallejos td18–1 td  +1 td7 td Win td UFC Fight Night 269 td Josh Emmett td &#91; 89 &#93; tdTBD td
+th10 td td Steve Garcia td19–6 td  −1 td0 td Loss td UFC Freedom 250 td Diego Lopes td &#91; 84 &#93; tdTBD td
+th11 td td Brian Ortega td16–5 (1 NC) td td0 td Loss td UFC Fight Night 257 td Aljamain Sterling td &#91; 90 &#93; td (January 30, 2026) – Undisclosed injury td &#91; 91 &#93;
+th12 td td Aaron Pico td14–5 td td1 td Win td UFC 327 td Patrício Pitbull td &#91; 92 &#93; tdTBD td
+th13 td td Melquizael Costa td26–8 td td0 td Loss td UFC Fight Night 276 td Arnold Allen td &#91; 88 &#93; tdTBD td
+th14 td td David Onama td14–3 td td0 td Loss td UFC Fight Night 263 td Steve Garcia td &#91; 93 &#93; tdTBD td
+
+==== Lightweight ====
+thRank th ISO thFighter thRecord th M thWin streak thLast fight thNext fight
+thResult thEvent thOpponent thRef. thEvent thOpponent thRef.
+th C td td Justin Gaethje td28–5 td  +1 td3 (0 def) td Win td UFC Freedom 250 td Ilia Topuria td &#91; 67 &#93; td TBD td
+th1 td td Ilia Topuria td17–1 td  −1 td0 td Loss td UFC Freedom 250 td Justin Gaethje td &#91; 67 &#93; td (June 14, 2026) – Broken orbital td &#91; 3 &#93;
+th2 td td Arman Tsarukyan td23–3 td td5 td Win td UFC Fight Night 265 td Dan Hooker td &#91; 68 &#93; tdTBD td
+th3 td td Charles Oliveira td37–11 (1 NC) td td2 td Win td UFC 326 td Max Holloway td &#91; 69 &#93; tdTBD td
+th4 td td Max Holloway td27–9 td td0 td Loss td UFC 326 td Charles Oliveira td &#91; 69 &#93; td UFC 329 td Conor McGregor td &#91; 70 &#93;
+th5 td td Benoît Saint Denis td17–3 (1 NC) td td4 td Win td UFC 325 td Dan Hooker td &#91; 71 &#93; td UFC 329 td Paddy Pimblett td &#91; 72 &#93;
+th6 td td Paddy Pimblett td23–4 td td0 td Loss td UFC 324 td Justin Gaethje td &#91; 73 &#93; td UFC 329 td Benoît Saint Denis td &#91; 72 &#93;
+th7 td td Maurício Ruffy td14–2 td  +2 td2 td Win td UFC Freedom 250 td Michael Chandler td &#91; 74 &#93; tdTBD td
+th8 td td Mateusz Gamrot td26–4 (1 NC) td  −1 td1 td Win td UFC 327 td Esteban Ribovics td &#91; 75 &#93; tdTBD td
+th9 td td Dan Hooker td24–14 td  −1 td0 td Loss td UFC 325 td Benoît Saint Denis td &#91; 71 &#93; tdTBD td
+th10 td td Renato Moicano td21–7–1 td  −1 td1 td Win td UFC Fight Night 272 td Chris Duncan td &#91; 76 &#93; tdTBD td
+th11 td td Rafael Fiziev td13–5 td td0 td Loss td UFC 325 td Maurício Ruffy td &#91; 77 &#93; td UFC Fight Night 280 td Manuel Torres td &#91; 78 &#93;
+th12 td td Quillan Salkilld td12–1 td td12 td Win td UFC Fight Night 275 td Beneil Dariush td &#91; 79 &#93; tdTBD td
+th13 td td Beneil Dariush td23–8–1 td  +1 td0 td Loss td UFC Fight Night 275 td Quillan Salkilld td &#91; 79 &#93; tdTBD td
+th14 td tdTom Nolan td11���1 td  +1 td5 td Win td UFC Fight Night 278 td Farès Ziam td &#91; 80 &#93; tdTBD td
+
+==== Welterweight ====
+thRank th ISO thFighter thRecord th M thWin streak thLast fight thNext fight
+thResult thEvent thOpponent thRef. thEvent thOpponent thRef.
+th C td td Islam Makhachev td28–1 td td16 (0 def) td Win td UFC 322 td Jack Della Maddalena td &#91; 53 &#93; td UFC 330 td Ian Machado Garry td &#91; 2 &#93;
+th1 td td Ian Machado Garry td17–1 td td2 td Win td UFC Fight Night 265 td Belal Muhammad td &#91; 54 &#93; td UFC 330 td Islam Makhachev td &#91; 2 &#93;
+th2 td td Carlos Prates td24–7 td td3 td Win td UFC Fight Night 275 td Jack Della Maddalena td &#91; 55 &#93; td TBD td
+th3 td td Michael Morales td19–0 td td19 td Win td UFC 322 td Sean Brady td &#91; 56 &#93; tdTBD td
+th4 td td Jack Della Maddalena td18–4 td td0 td Loss td UFC Fight Night 275 td Carlos Prates td &#91; 55 &#93; tdTBD td
+th5 td td Gabriel Bonfim td20–1 td td5 td Win td UFC Fight Night 278 td Belal Muhammad td &#91; 57 &#93; tdTBD td
+th6 td td Sean Brady td19–2 td td1 td Win td UFC 328 td Joaquin Buckley td &#91; 58 &#93; tdTBD td
+th7 td td Belal Muhammad td24–6 (1 NC) td td0 td Loss td UFC Fight Night 278 td Gabriel Bonfim td &#91; 57 &#93; tdTBD td
+th8 td td Leon Edwards td22–6 (1 NC) td td0 td Loss td UFC 322 td Carlos Prates td &#91; 59 &#93; tdTBD td
+th9 td td Kamaru Usman td21–4 td td1 td Win td UFC on ESPN 69 td Joaquin Buckley td &#91; 60 &#93; td UFC Fight Night 281 td Dricus du Plessis td &#91; 40 &#93;
+th10 td td Joaquin Buckley td21–8 td td0 td Loss td UFC 328 td Sean Brady td &#91; 58 &#93; tdTBD td
+th11 td td Yaroslav Amosov td30–1 td td3 td Win td UFC 328 td Joel Álvarez td &#91; 61 &#93; tdTBD td
+th12 td td Mike Malott td14–2–1 td td4 td Win td UFC Fight Night 273 td Gilbert Burns td &#91; 62 &#93; tdTBD td
+th13 td td Michael Page td25–3 td td3 td Win td UFC Fight Night 270 tdSam Patterson td &#91; 63 &#93; tdTBD td
+th14 td td Uroš Medić td13–3 td td3 td Win td UFC Fight Night 267 td Geoff Neal td &#91; 64 &#93; td UFC Fight Night 283 td Daniel Rodriguez td &#91; 65 &#93;
+
+==== Middleweight ====
+thRank th ISO thFighter thRecord th M thWin streak thLast fight thNext fight
+thResult thEvent thOpponent thRef. thEvent thOpponent thRef.
+th C td td Sean Strickland td31–7 td td2 (0 def) td Win td UFC 328 td Khamzat Chimaev td &#91; 38 &#93; td TBD td
+th1 td td Khamzat Chimaev td15–1 td td0 td Loss td UFC 328 td Sean Strickland td &#91; 38 &#93; tdTBD td
+th2 td td Dricus du Plessis td23–3 td td0 td Loss td UFC 319 td Khamzat Chimaev td &#91; 39 &#93; td UFC Fight Night 281 td Kamaru Usman td &#91; 40 &#93;
+th3 td td Nassourdine Imavov td17–4 (1 NC) td td5 td Win td UFC Fight Night 258 td Caio Borralho td &#91; 41 &#93; tdTBD td
+th4 td td Brendan Allen td27–7 td td3 td Win td UFC Fight Night 278 td Edmen Shahbazyan td &#91; 42 &#93; tdTBD td
+th5 td td Caio Borralho td18–2 (1 NC) td td1 td Win td UFC 326 td Reinier de Ridder td &#91; 43 &#93; td (June 6, 2026) – Rib injury td &#91; 44 &#93;
+th6 td td Anthony Hernandez td15–3 (1 NC) td td0 td Loss td UFC Fight Night 267 td Sean Strickland td &#91; 45 &#93; tdTBD td
+th7 td td Joe Pyfer td16–3 td td4 td Win td UFC Fight Night 271 td Israel Adesanya td &#91; 46 &#93; tdTBD td
+th8 td td Reinier de Ridder td21–4 td td0 td Loss td UFC 326 td Caio Borralho td &#91; 43 &#93; tdTBD td
+th9 td td Israel Adesanya td24–6 td td0 td Loss td UFC Fight Night 271 td Joe Pyfer td &#91; 46 &#93; tdTBD td
+th10 td td Robert Whittaker td26–9 td td0 td Loss td UFC on ABC 9 td Reinier de Ridder td &#91; 47 &#93; td UFC 329 td Nikita Krylov td &#91; 35 &#93;
+th11 td td Jared Cannonier td18–9 td td0 td Loss td UFC 319 td Michael Page td &#91; 48 &#93; td UFC Fight Night 281 td Christian Leroy Duncan td &#91; 49 &#93;
+th12 td td Gregory Rodrigues td19–6 td td3 td Win td UFC 326 tdBrunno Ferreira td &#91; 50 &#93; tdTBD td
+th13 td td Christian Leroy Duncan td14–2 td td4 td Win td UFC Fight Night 270 td Roman Dolidze td &#91; 51 &#93; td UFC Fight Night 281 td Jared Cannonier td &#91; 49 &#93;
+th14 td td Roman Dolidze td15–5 td td0 td Loss td UFC Fight Night 270 td Christian Leroy Duncan td &#91; 51 &#93; tdTBD td
+
+==== Light_Heavyweight ====
+thRank th ISO thFighter thRecord th M thWin streak thLast fight thNext fight
+thResult thEvent thOpponent thRef. thEvent thOpponent thRef.
+th C td td Carlos Ulberg td14–1 td td10 (0 def) td Win td UFC 327 td Jiří Procházka td &#91; 22 &#93; td (April 18, 2026) – Torn ACL td &#91; 23 &#93;
+th1 td td Magomed Ankalaev td20–2–1 (1 NC) td td0 td Loss td UFC 320 td Alex Pereira td &#91; 24 &#93; td UFC Fight Night 282 td Khalil Rountree Jr. td &#91; 25 &#93;
+th2 td td Alex Pereira td13–4 td td0 td Loss td UFC Freedom 250 td Ciryl Gane td &#91; 6 &#93; td TBD td
+th3 td td Jiří Procházka td32–6–1 td td0 td Loss td UFC 327 td Carlos Ulberg td &#91; 22 &#93; tdTBD td
+th4 td td Jan Błachowicz td 29–11–2 td td0 td Draw td UFC 323 td Bogdan Guskov td &#91; 26 &#93; td (April 18, 2026) – Meniscus tear td &#91; 27 &#93;
+th5 td td Khalil Rountree Jr. td14–7 (1 NC) td td0 td Loss td UFC 320 td Jiří Procházka td &#91; 28 &#93; td UFC Fight Night 282 td Magomed Ankalaev td &#91; 25 &#93;
+th6 td td Jamahal Hill td12–4 (1 NC) td td0 td Loss td UFC on ABC 8 td Khalil Rountree Jr. td &#91; 29 &#93; td (October 25, 2025) – Knee surgeries td &#91; 30 &#93;
+th7 td td Paulo Costa td16–4 td td2 td Win td UFC 327 td Azamat Murzakanov td &#91; 31 &#93; tdTBD td
+th8 td td Azamat Murzakanov td16–1 td td0 td Loss td UFC 327 td Paulo Costa td &#91; 31 &#93; tdTBD td
+th9 td td Volkan Oezdemir td21–8 td td1 td Win td UFC Fight Night 265 td Alonzo Menifield td &#91; 32 &#93; tdTBD td
+th10 td td Bogdan Guskov td18–3–1 td td0 td Draw td UFC 323 td Jan Błachowicz td &#91; 26 &#93; tdTBD td
+th11 td td Dominick Reyes td16–5 td td1 td Win td UFC 327 td Johnny Walker td &#91; 33 &#93; tdTBD td
+th12 td td Nikita Krylov td31–11 td td1 td Win td UFC 324 td Modestas Bukauskas td &#91; 34 &#93; td UFC 329 td Robert Whittaker td &#91; 35 &#93;
+th13 td td Johnny Walker td22–10 (1 NC) td td0 td Loss td UFC 327 td Dominick Reyes td &#91; 33 &#93; td UFC Fight Night 283 td Ante Delija td &#91; 16 &#93;
+th14 td td Aleksandar Rakić td14–6 td td0 td Loss td UFC 321 td Azamat Murzakanov td &#91; 36 &#93; td UFC Fight Night 283 td Marcin Tybura td &#91; 17 &#93;
+
+==== Heavyweight ====
+thRank th ISO thFighter thRecord th M thWin streak thLast fight thNext fight
+thResult thEvent thOpponent thRef. thEvent thOpponent thRef.
+th C td td Tom Aspinall td15–3 (1 NC) td td0 (0 def) td @media screen{html.skin-theme-clientpref-night .mw-parser-output div:not(.notheme)>.tmp-color,html.skin-theme-clientpref-night .mw-parser-output p>.tmp-color,html.skin-theme-clientpref-night .mw-parser-output table:not(.notheme) .tmp-color{color:inherit!important}}@media screen and (prefers-color-scheme:dark){html.skin-theme-clientpref-os .mw-parser-output div:not(.notheme)>.tmp-color,html.skin-theme-clientpref-os .mw-parser-output p>.tmp-color,html.skin-theme-clientpref-os .mw-parser-output table:not(.notheme) .tmp-color{color:inherit!important}} NC td UFC 321 td Ciryl Gane td &#91; 5 &#93; td (March 7, 2026) – Eye surgery td &#91; 4 &#93;
+th IC td td Ciryl Gane td14–2 (1 NC) td td1 (0 def) td Win td UFC Freedom 250 td Alex Pereira td &#91; 6 &#93; td TBD td
+th2 td td Alexander Volkov td40–11 td td2 td Win td UFC 328 td Waldo Cortes-Acosta td &#91; 7 &#93; tdTBD td
+th3 td td Sergei Pavlovich td21–3 td td3 td Win td UFC Fight Night 277 td Tallison Teixeira td &#91; 8 &#93; tdTBD td
+th4 td td Josh Hokit td10–0 td  +1 td10 td Win td UFC Freedom 250 td Derrick Lewis td &#91; 9 &#93; tdTBD td
+th5 td td Waldo Cortes-Acosta td17–3 td  −1 td0 td Loss td UFC 328 td Alexander Volkov td &#91; 7 &#93; tdTBD td
+th6 td td Serghei Spivac td18–6 td td1 td Win td UFC Fight Night 267 td Ante Delija td &#91; 10 &#93; tdUFC Fight Night 285 td Vitor Petrino td &#91; 11 &#93;
+th7 td td Curtis Blaydes td19–6 (1 NC) td td0 td Loss td UFC 327 td Josh Hokit td &#91; 12 &#93; tdTBD td
+th8 td td Rizvan Kuniev td13–3–1 (1 NC) td td1 td Win td UFC Fight Night 266 td Jailton Almeida td &#91; 13 &#93; td UFC Fight Night 282 td Tyrell Fortune td &#91; 14 &#93;
+th9 td td Tyrell Fortune td18–3 (2 NC) td  +1 td4 td Win td UFC Fight Night 271 td Marcin Tybura td &#91; 15 &#93; td UFC Fight Night 282 td Rizvan Kuniev td &#91; 14 &#93;
+th10 td td Ante Delija td26–8 td  +1 td0 td Loss td UFC Fight Night 267 td Serghei Spivac td &#91; 10 &#93; td UFC Fight Night 283 td Johnny Walker td &#91; 16 &#93;
+th11 td td Derrick Lewis td29–14 (1 NC) td  −2 td0 td Loss td UFC Freedom 250 td Josh Hokit td &#91; 9 &#93; tdTBD td
+th12 td td Marcin Tybura td27–11 td td0 td Loss td UFC Fight Night 271 td Tyrell Fortune td &#91; 15 &#93; td UFC Fight Night 283 td Aleksandar Rakić td &#91; 17 &#93;
+th13 td td Valter Walker td15–1 td td4 td Win td UFC 321 tdLouie Sutherland td &#91; 18 &#93; td UFC Fight Night 282 tdThomas Petersen td &#91; 19 &#93;
+th14 td tdBrando Peričić td7–1 td td3 td Win td UFC Fight Night 275 td Shamil Gaziev td &#91; 20 &#93; tdTBD td
+
+==== Men's_pound-for-pound ====
+thRank th ISO thFighter thRecord thWin streak th .mw-parser-output .tooltip-dotted{border-bottom:1px dotted;cursor:help} M thWeight class thStatus thNext fight
+thEvent thOpponent thRef.
+th1 td td Islam Makhachev td28–1 td16 td td Welterweight td Welterweight Champion td UFC 330 td Ian Machado Garry td &#91; 2 &#93;
+th2 td td Alexander Volkanovski td28–4 td2 td  +1 td Featherweight td Featherweight Champion td td td
+th3 td td Petr Yan td20–5 td4 td  +2 td Bantamweight td Bantamweight Champion td td td
+th4 td td Justin Gaethje td28–5 td3 td td Lightweight td Lightweight Champion td td td
+th5 td td Ilia Topuria td17–1 td0 td  −3 td Lightweight td #1 in lightweight rankings td (June 14, 2026) – Broken orbital td &#91; 3 &#93;
+th6 td td Tom Aspinall td15–3 (1 NC) td0 td td Heavyweight td Heavyweight Champion td (March 7, 2026) – Eye surgery td &#91; 4 &#93;
+th7 td td Sean Strickland td31–7 td2 td  +1 td Middleweight td Middleweight Champion td td td
+th8 td td Alex Pereira td13–4 td0 td  −4 td Heavyweight td #2 in light heavyweight rankings td td td
+th9 td td Merab Dvalishvili td21–5 td0 td  −2 td Bantamweight td #1 in bantamweight rankings td td td
+th10 td td Joshua Van td17–2 td7 td  −1 td Flyweight td Flyweight Champion td td td
+th11 td td Khamzat Chimaev td15–1 td0 td  −1 td Middleweight td #1 in middleweight rankings td td td
+th12 td td Ciryl Gane td14–2 (1 NC) td1 td td Heavyweight td Interim Heavyweight Champion td td td
+th13 td td Alexandre Pantoja td30–6 td0 td  −2 td Flyweight td #1 in flyweight rankings td td td
+th14 td td Charles Oliveira td37–11 (1 NC) td2 td  −2 td Lightweight td #3 in lightweight rankings BMF Champion td td td
+th15 td td Arman Tsarukyan td23–3 td5 td td Lightweight td #2 in lightweight rankings td td td
